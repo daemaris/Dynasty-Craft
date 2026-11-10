@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0614">
+<title>Dynasty Craft — L'app du Coven</title>
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="Dynasty Craft — serveur Minecraft RPG. Lore de Solaris, guide du modpack, actualités du Coven.">
+<meta name="apple-mobile-web-app-title" content="Dynasty">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=UnifrakturMaguntia&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Pixelify+Sans:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08040f; --bg2:#120a1f; --card:rgba(30,16,48,.72); --card2:rgba(44,24,70,.85);
+  --line:rgba(205,170,255,.14); --ink:#f1eaff; --mute:#b6a3d1; --dim:#7d6a99;
+  --moon:#efe2ff; --ice:#d8b4fe; --ice2:#8b3dff; --violet:#c084fc; --gold:#f0c060; --moss:#a78bfa; --blood:#f472b6; --live:#7ee0a0;
+  --r:18px; --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#030106;color:var(--ink);font-family:Inter,system-ui,sans-serif}
+body{display:flex;justify-content:center;align-items:center;overflow:hidden}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input,textarea{font:inherit;color:inherit}
+
+/* phone frame on desktop, full-bleed on mobile */
+.device{position:relative;width:100%;height:100%;max-width:430px;background:radial-gradient(120% 70% at 50% -10%,#2c1250 0%,#140a24 45%,var(--bg) 100%);overflow:hidden;overflow:clip;isolation:isolate}
+#sky{position:absolute;inset:0;z-index:-1;pointer-events:none}
+.fog{position:absolute;left:-20%;right:-20%;bottom:-10%;height:45%;z-index:-1;pointer-events:none;
+  background:radial-gradient(50% 60% at 30% 100%,rgba(150,90,230,.16),transparent 70%),radial-gradient(40% 50% at 75% 100%,rgba(244,114,182,.10),transparent 70%);
+  animation:drift 22s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translateX(6%)}}
+
+/* screens */
+.screens{position:absolute;inset:0;bottom:calc(74px + var(--safe-b))}
+.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:calc(18px + var(--safe-t)) 18px 28px;opacity:0;transform:translateY(14px) scale(.985);pointer-events:none;transition:opacity .35s ease,transform .45s cubic-bezier(.2,.8,.2,1);scrollbar-width:none}
+.screen::-webkit-scrollbar{display:none}
+.screen.on{opacity:1;transform:none;pointer-events:auto}
+
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.eyebrow{font-family:'Pixelify Sans',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ice)}
+h1,h2,h3{font-family:Cinzel,serif;margin:0;letter-spacing:.02em}
+h1{font-family:UnifrakturMaguntia,Cinzel,serif;font-size:32px;font-weight:400;letter-spacing:.01em;background:linear-gradient(180deg,#fff,#e2c6ff 55%,#b57bff);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 12px rgba(192,132,252,.45))}
+h2{font-size:19px;font-weight:700;margin:26px 0 12px}
+.sub{color:var(--mute);font-size:14px;line-height:1.5}
+.avatar{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--violet),var(--ice2));display:grid;place-items:center;font-family:'Pixelify Sans';font-weight:600;box-shadow:0 0 0 2px rgba(255,255,255,.08)}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:99px;font-size:12px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--mute)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--live);box-shadow:0 0 10px var(--live);animation:pulse 2s infinite}
+@keyframes pulse{50%{opacity:.4}}
+
+/* HOME */
+.hero{position:relative;aspect-ratio:1/1;border-radius:50%;overflow:hidden;margin:4px 6px 0;box-shadow:0 0 0 1px rgba(216,180,254,.3),0 0 60px rgba(168,85,247,.45),0 0 140px rgba(244,114,182,.15);animation:glow 5s ease-in-out infinite alternate}
+@keyframes glow{to{box-shadow:0 0 0 1px rgba(216,180,254,.45),0 0 80px rgba(168,85,247,.6),0 0 160px rgba(244,114,182,.25)}}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.02);animation:kb 20s ease-in-out infinite alternate}
+@keyframes kb{to{transform:scale(1.07)}}
+.hero::after{content:none}
+.hcap{text-align:center;margin-top:16px}
+.hcap p{margin:6px 0 0;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:17px;color:#e9dcff}
+.status{display:grid;grid-template-columns:1fr 1fr 1fr;margin-top:14px;padding:14px 6px}
+.status div{text-align:center;border-right:1px solid var(--line)}
+.status div:last-child{border:0}
+.status b{display:block;font-family:'Pixelify Sans';font-size:20px;font-weight:600}
+.status span{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em}
+.copyip{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;margin-top:10px}
+.discord{display:flex;align-items:center;gap:12px;padding:12px 14px;margin-top:10px;text-decoration:none;color:inherit;background:linear-gradient(135deg,rgba(88,101,242,.28),rgba(168,85,247,.22));border-color:rgba(160,150,255,.3)}
+.discord .dico{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:#5865f2;color:#fff;box-shadow:0 6px 18px rgba(88,101,242,.45)}
+.discord .dico svg{width:22px;height:22px}
+.discord b{display:block;font-size:14.5px}.discord small{color:var(--mute);font-size:12.5px}.discord .chev{color:var(--mute);font-size:20px}
+.copyip code{font-family:'Pixelify Sans';color:var(--ice);font-size:15px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:12px;background:linear-gradient(135deg,#a855f7,#6d28d9);font-weight:600;font-size:14px;box-shadow:0 6px 20px rgba(139,61,255,.45)}
+.btn.ghost{background:rgba(255,255,255,.06);box-shadow:none;border:1px solid var(--line)}
+.featured{position:relative;padding:18px;overflow:hidden;margin-top:6px}
+.featured::before{content:"";position:absolute;width:220px;height:220px;right:-70px;top:-90px;border-radius:50%;background:radial-gradient(circle,rgba(216,180,254,.4),rgba(216,180,254,0) 65%)}
+.featured h3{font-size:20px;margin:8px 0 6px}
+.featured p{font-family:'Cormorant Garamond',serif;font-size:17px;line-height:1.45;color:#ddd0f2;margin:0 0 14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{padding:14px;text-align:left;transition:transform .2s}
+.tile:active{transform:scale(.97)}
+.tile .ic{font-size:22px;margin-bottom:8px;display:block}
+.tile b{display:block;font-size:14px}
+.tile small{color:var(--dim);font-size:12px}
+.news{display:flex;gap:12px;padding:12px;align-items:center;margin-bottom:10px}
+.news .d{min-width:46px;height:46px;border-radius:12px;display:grid;place-items:center;text-align:center;background:rgba(167,123,255,.14);color:var(--violet);font-family:'Pixelify Sans';font-size:12px;line-height:1.1}
+.news b{font-size:14px;display:block}
+.news small{color:var(--mute);font-size:12.5px}
+
+/* PROFILE */
+.greet{padding:0;text-align:left;cursor:pointer;border-bottom:1px dashed rgba(216,180,254,.35)}
+.pron{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pron button{padding:12px 6px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--line);text-align:center;transition:.2s}
+.pron button b{display:block;font-size:14px}.pron button small{color:var(--dim);font-size:11.5px}
+.pron button.on{background:rgba(192,132,252,.22);border-color:rgba(216,180,254,.5)}
+/* NEWS */
+.sechead{display:flex;align-items:center;justify-content:space-between;margin:26px 0 12px}
+.sechead h2{margin:0}
+.write{font-size:13px;font-weight:600;padding:8px 12px;border-radius:12px;background:linear-gradient(135deg,rgba(192,132,252,.25),rgba(244,114,182,.2));border:1px solid rgba(216,180,254,.3)}
+.ncar{display:flex;gap:12px;overflow-x:auto;margin:0 -18px;padding:2px 18px 8px;scroll-snap-type:x mandatory;scrollbar-width:none}
+.ncar::-webkit-scrollbar{display:none}
+.ncard{min-width:78%;scroll-snap-align:start;text-align:left;padding:0;overflow:hidden;transition:transform .2s}
+.ncard:active,.nrow:active{transform:scale(.98)}
+.cover{position:relative;height:150px;display:grid;place-items:center;overflow:hidden}
+.cover .big{font-size:58px;filter:drop-shadow(0 8px 24px rgba(0,0,0,.5));animation:float 6s ease-in-out infinite}
+.cover::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 20%,rgba(255,255,255,.18),transparent 40%),linear-gradient(transparent 55%,rgba(0,0,0,.35))}
+.cover .cat{position:absolute;left:12px;top:12px;z-index:2}
+.cat{font-family:'Pixelify Sans';font-size:10.5px;letter-spacing:.06em;padding:3px 8px;border-radius:7px;background:rgba(0,0,0,.45);color:var(--cc,#fff);border:1px solid rgba(255,255,255,.12)}
+.ncard .nb{padding:12px 14px 14px}
+.ncard .nb b{font-family:Cinzel;font-size:16px;display:block;line-height:1.25}
+.ncard .nb p{margin:6px 0 8px;font-size:13px;color:var(--mute);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.meta{font-size:11.5px;color:var(--dim)}
+.new{font-family:'Pixelify Sans';font-size:10px;padding:2px 6px;border-radius:6px;background:var(--blood);color:#fff;margin-left:6px}
+.chips{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chips button{white-space:nowrap;font-size:12.5px;padding:7px 12px;border-radius:99px;background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--mute);transition:.2s}
+.chips button.on{background:rgba(192,132,252,.22);border-color:rgba(216,180,254,.4);color:var(--ink)}
+.nrow{display:flex;gap:12px;padding:10px;margin-bottom:10px;width:100%;text-align:left;align-items:center;transition:transform .2s}
+.nrow .th{min-width:64px;height:64px;border-radius:14px;display:grid;place-items:center;font-size:28px}
+.nrow b{font-size:14.5px;display:block;line-height:1.3}
+.nrow small{display:block;color:var(--mute);font-size:12.5px;margin:3px 0;line-height:1.35}
+.rbody ul{font-family:'Cormorant Garamond',serif;font-size:19px;line-height:1.5;color:#ece2fb;padding-left:22px;margin:0 0 18px}
+.rbody li{margin-bottom:6px}
+.rbody b{color:#fff}
+.ahead{border-radius:20px;height:170px;display:grid;place-items:center;font-size:70px;margin:4px 0 18px;position:relative;overflow:hidden}
+.sheet{position:absolute;inset:0;z-index:50;background:rgba(5,2,10,.55);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .3s}
+.sheet.on{opacity:1;pointer-events:auto}
+.sheetin{position:absolute;left:0;right:0;bottom:0;max-height:92%;overflow-y:auto;background:linear-gradient(#1d0f31,#0e0719);border-top:1px solid var(--line);border-radius:26px 26px 0 0;padding:10px 18px calc(22px + var(--safe-b));transform:translateY(100%);transition:transform .45s cubic-bezier(.2,.8,.2,1);scrollbar-width:none}
+.sheet.on .sheetin{transform:none}
+.grab{width:42px;height:5px;border-radius:5px;background:rgba(255,255,255,.18);margin:0 auto 12px}
+.ecover{height:110px;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;margin-bottom:10px;font-size:40px;transition:background .3s}
+.ecover b{font-family:Cinzel;font-size:14px;padding:0 14px;text-align:center}
+.themes{display:flex;gap:8px;margin-bottom:12px}
+.themes button{flex:1;height:36px;border-radius:10px;font-size:18px;border:2px solid transparent}
+.themes button.on{border-color:#fff}
+.fl{display:block;font-size:12px;color:var(--mute);margin-bottom:12px;letter-spacing:.02em}
+.fl input,.fl textarea{display:block;width:100%;margin-top:6px;padding:11px 13px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--line);outline:0;font-size:15px;resize:vertical}
+.fl input:focus,.fl textarea:focus{border-color:rgba(216,180,254,.5)}
+.fl .chips{margin:6px 0 0}
+
+/* LORE */
+.timeline{position:relative;padding-left:26px;margin-top:8px}
+.timeline::before{content:"";position:absolute;left:9px;top:8px;bottom:8px;width:2px;background:linear-gradient(var(--gold),var(--violet) 40%,var(--blood) 75%,var(--ice))}
+.chap{position:relative;display:block;width:100%;text-align:left;padding:14px 16px;margin-bottom:12px;transition:transform .2s,border-color .2s}
+.chap:active{transform:scale(.98)}
+.chap::before{content:"";position:absolute;left:-23px;top:20px;width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px solid var(--c,var(--gold));box-shadow:0 0 12px var(--c,var(--gold))}
+.chap .era{font-family:'Pixelify Sans';font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--c,var(--gold))}
+.chap h3{font-size:17px;margin:4px 0}
+.chap p{margin:0;color:var(--mute);font-size:13.5px;line-height:1.45}
+.chap .read{position:absolute;right:14px;top:14px;font-size:11px;color:var(--moss)}
+.seg{display:flex;padding:4px;gap:4px;border-radius:14px;margin:4px 0 14px}
+.seg button{flex:1;padding:9px;border-radius:10px;font-size:13px;color:var(--mute);transition:.25s}
+.seg button.on{background:rgba(255,255,255,.09);color:var(--ink)}
+.races{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.race{padding:14px;text-align:left}
+.race .glyph{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:20px;margin-bottom:10px;background:rgba(255,255,255,.06)}
+.race b{font-family:Cinzel;font-size:15px}
+.race p{margin:4px 0 0;font-size:12.5px;color:var(--mute);line-height:1.4}
+
+/* reader */
+.reader{position:absolute;inset:0;z-index:40;background:radial-gradient(100% 50% at 50% 0%,#2a1446,#0a0512 60%);transform:translateY(100%);transition:transform .5s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column}
+.reader.on{transform:none}
+.rbar{display:flex;align-items:center;justify-content:space-between;padding:calc(14px + var(--safe-t)) 16px 10px}
+.rbar .prog{flex:1;height:3px;margin:0 14px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.rbar .prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--violet))}
+.icobtn{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:rgba(255,255,255,.06);border:1px solid var(--line);font-size:16px}
+.rbody{flex:1;overflow-y:auto;padding:8px 26px calc(40px + var(--safe-b));scrollbar-width:none}
+.rbody::-webkit-scrollbar{display:none}
+.rbody .era{font-family:'Pixelify Sans';font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--c)}
+.rbody h2{font-size:28px;margin:8px 0 18px;line-height:1.15}
+.rbody p{font-family:'Cormorant Garamond',serif;font-size:20px;line-height:1.6;color:#ece2fb;margin:0 0 18px}
+.rbody p:first-of-type::first-letter{font-family:Cinzel;font-size:58px;float:left;line-height:.9;margin:6px 10px 0 0;color:var(--c)}
+.rbody .orn{text-align:center;color:var(--dim);letter-spacing:.6em;margin:26px 0}
+.rnav{display:flex;gap:10px;margin-top:10px}
+.rnav button{flex:1}
+
+/* GUIDE */
+.search{display:flex;align-items:center;gap:10px;padding:12px 14px;margin-bottom:14px}
+.search input{flex:1;background:none;border:0;outline:0;font-size:15px}
+.steps{padding:6px 14px}
+.step{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.step:last-child{border:0}
+.check{min-width:24px;height:24px;border-radius:8px;border:2px solid var(--dim);display:grid;place-items:center;transition:.25s;margin-top:1px}
+.step.done .check{background:var(--violet);border-color:var(--violet);color:#1a0830}
+.step.done b{text-decoration:line-through;color:var(--dim)}
+.step b{font-size:14.5px;display:block}
+.step small{color:var(--mute);font-size:13px;line-height:1.45}
+.step code,.acc code,.cmd code{font-family:'Pixelify Sans';color:var(--ice);font-size:13.5px;background:rgba(216,180,254,.10);padding:1px 6px;border-radius:6px}
+.progress{display:flex;align-items:center;gap:12px;padding:14px;margin-bottom:12px}
+.ring{--p:0;width:54px;height:54px;border-radius:50%;background:conic-gradient(var(--moss) calc(var(--p)*1%),rgba(255,255,255,.08) 0);display:grid;place-items:center;transition:--p .5s}
+.ring span{width:42px;height:42px;border-radius:50%;background:var(--bg2);display:grid;place-items:center;font-family:'Pixelify Sans';font-size:14px}
+.acc{margin-bottom:10px;overflow:hidden}
+.acc>button{width:100%;display:flex;align-items:center;gap:12px;padding:14px;text-align:left}
+.acc>button .ic{font-size:20px}
+.acc>button b{flex:1;font-size:15px}
+.acc>button .chev{transition:transform .3s;color:var(--dim)}
+.acc.open>button .chev{transform:rotate(90deg)}
+.acc .inner{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s ease}
+.acc.open .inner{grid-template-rows:1fr}
+.acc .inner>div{overflow:hidden}
+.acc .content{padding:0 16px 16px;font-size:14px;line-height:1.55;color:#ddd0f2}
+.acc .content ul{padding-left:18px;margin:8px 0}
+.acc .content li{margin-bottom:6px}
+.coins{display:flex;gap:10px;margin:10px 0}
+.coin{flex:1;padding:12px;border-radius:14px;text-align:center;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+.coin .c{width:34px;height:34px;margin:0 auto 6px;border-radius:50%;display:grid;place-items:center;font-size:18px}
+.conv{display:flex;align-items:center;gap:8px;margin-top:8px;padding:10px;border-radius:12px;background:rgba(0,0,0,.25)}
+.conv input{width:70px;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:8px;padding:6px 8px;outline:0}
+.jobs{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;margin:0 -16px;padding-left:16px;padding-right:16px;scroll-snap-type:x mandatory;scrollbar-width:none}
+.jobs::-webkit-scrollbar{display:none}
+.job{min-width:200px;scroll-snap-align:start;padding:14px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+.job .ic{font-size:24px}
+.job b{display:block;font-family:Cinzel;font-size:14px;margin:6px 0 2px}
+.job small{display:block;color:var(--dim);font-size:11.5px;margin-bottom:6px}
+.job p{margin:0;font-size:12.5px;color:var(--mute);line-height:1.4}
+.cmd{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.cmd span{color:var(--mute);text-align:right}
+.empty{text-align:center;color:var(--dim);padding:20px;font-size:14px}
+
+/* MESSAGES */
+.convs .cv.act{border-color:rgba(216,180,254,.45);background:rgba(60,30,95,.7)}
+.convs .cv{display:flex;align-items:center;gap:12px;padding:12px;margin-bottom:8px;width:100%;text-align:left}
+.cv .av{position:relative;min-width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-family:'Pixelify Sans';font-weight:600;font-size:16px}
+.cv .av .on{position:absolute;right:-2px;bottom:-2px;width:12px;height:12px;border-radius:50%;background:var(--live);border:2px solid var(--bg2)}
+.cv .mid{flex:1;min-width:0}
+.cv .mid b{font-size:14.5px;display:flex;gap:6px;align-items:center}
+.cv .mid small{display:block;color:var(--mute);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cv .rt{text-align:right;font-size:11px;color:var(--dim)}
+.badge{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--violet);color:#fff;font-size:11px;font-weight:600;margin-top:4px}
+.tag{font-family:'Pixelify Sans';font-size:10px;padding:2px 6px;border-radius:6px;background:rgba(240,192,96,.15);color:var(--gold);font-weight:400}
+.chat{position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;background:linear-gradient(#170b28,#0a0512);transform:translateX(100%);transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.chat.on{transform:none}
+.chead{display:flex;align-items:center;gap:12px;padding:calc(12px + var(--safe-t)) 14px 12px;border-bottom:1px solid var(--line);background:rgba(18,9,30,.8);backdrop-filter:blur(10px)}
+.chead b{display:block;font-size:15px}
+.chead small{color:var(--moss);font-size:12px}
+.msgs{flex:1;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;gap:8px;scrollbar-width:none}
+.msgs::-webkit-scrollbar{display:none}
+.m{max-width:80%;padding:10px 13px;border-radius:18px;font-size:14.5px;line-height:1.4;animation:pop .3s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pop{from{transform:scale(.85);opacity:0}}
+.m.them{align-self:flex-start;background:var(--card2);border:1px solid var(--line);border-bottom-left-radius:6px}
+.m.me{align-self:flex-end;background:linear-gradient(135deg,#c026d3,var(--ice2));border-bottom-right-radius:6px}
+.m small{display:block;font-size:10.5px;opacity:.6;margin-top:4px}
+.m.sys{align-self:center;background:none;font-size:12px;color:var(--dim);font-family:'Pixelify Sans';max-width:none}
+.m.loc{display:flex;gap:10px;align-items:center}
+.typing{align-self:flex-start;display:none;gap:4px;padding:12px 14px;border-radius:18px;background:var(--card2)}
+.typing.on{display:flex}
+.typing i{width:6px;height:6px;border-radius:50%;background:var(--mute);animation:bounce 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes bounce{50%{transform:translateY(-4px);opacity:.5}}
+.compose{display:flex;gap:8px;align-items:center;padding:10px 12px calc(10px + var(--safe-b));border-top:1px solid var(--line);background:rgba(18,9,30,.92)}
+.compose input{flex:1;padding:12px 14px;border-radius:22px;background:rgba(255,255,255,.06);border:1px solid var(--line);outline:0;font-size:15px}
+.send{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--violet),var(--ice2));display:grid;place-items:center;font-size:18px}
+.quick{display:flex;gap:6px;padding:0 12px 8px;overflow-x:auto;scrollbar-width:none}
+.quick button{white-space:nowrap;font-size:12.5px;padding:7px 11px;border-radius:99px;background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--mute)}
+.ingame{display:flex;gap:10px;align-items:center;padding:12px 14px;margin-bottom:14px;font-size:13px;color:var(--mute);line-height:1.4}
+.ingame b{color:var(--ink)}
+
+/* SHOP */
+.shophero{position:relative;padding:20px;overflow:hidden;text-align:center}
+.shophero .orb{width:90px;height:90px;margin:4px auto 12px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#b9a2ff 25%,#5b3fd1 60%,#1d1450);box-shadow:0 0 60px rgba(167,123,255,.6),inset -10px -14px 30px rgba(0,0,0,.4);animation:float 4s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-8px)}}
+.soon{position:absolute;top:14px;right:-34px;transform:rotate(35deg);background:var(--gold);color:#2a1d00;font-family:'Pixelify Sans';font-weight:600;font-size:12px;padding:4px 40px}
+.items{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.item{padding:12px;position:relative;overflow:hidden}
+.item .prev{height:110px;border-radius:12px;display:grid;place-items:center;margin-bottom:10px;position:relative;overflow:hidden}
+.item .prev svg{width:70px;height:70px;filter:drop-shadow(0 6px 16px rgba(0,0,0,.5));animation:float 5s ease-in-out infinite}
+.item b{font-size:13.5px;display:block}
+.item small{color:var(--dim);font-size:11.5px}
+.item .row{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.price{font-family:'Pixelify Sans';color:var(--gold);font-size:14px}
+.wish{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:rgba(255,255,255,.06);font-size:15px;transition:transform .2s}
+.wish.on{background:rgba(224,96,122,.18);transform:scale(1.1)}
+.rar{position:absolute;top:18px;left:18px;font-family:'Pixelify Sans';font-size:10px;padding:2px 7px;border-radius:6px;z-index:2}
+.fair{display:flex;gap:12px;padding:14px;margin-top:14px;font-size:13px;color:var(--mute);line-height:1.5}
+
+/* tab bar */
+.tabbar{position:absolute;left:0;right:0;bottom:0;height:calc(74px + var(--safe-b));padding:8px 10px var(--safe-b);display:flex;background:linear-gradient(transparent,rgba(8,4,15,.92) 30%);z-index:20}
+.tabbar .inner{flex:1;display:flex;background:rgba(28,15,46,.85);border:1px solid var(--line);border-radius:22px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);position:relative;height:58px}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10.5px;color:var(--dim);position:relative;z-index:2;transition:color .3s}
+.tab svg{width:22px;height:22px;transition:transform .3s}
+.tab.on{color:var(--ink)}
+.tab.on svg{transform:translateY(-1px) scale(1.08)}
+.tab .bdg{position:absolute;top:6px;right:calc(50% - 18px);width:8px;height:8px;border-radius:50%;background:var(--violet);box-shadow:0 0 8px var(--violet)}
+.glider{position:absolute;top:0;left:0;width:0;height:0;border-radius:17px;background:linear-gradient(135deg,rgba(192,132,252,.24),rgba(244,114,182,.18));border:1px solid rgba(216,180,254,.25);transition:transform .45s cubic-bezier(.3,1.3,.5,1),width .3s,height .3s}
+
+.toast{position:absolute;left:50%;top:calc(16px + var(--safe-t));transform:translate(-50%,-80px);z-index:60;padding:10px 16px;border-radius:14px;background:rgba(36,20,58,.95);border:1px solid var(--line);font-size:13.5px;transition:transform .4s cubic-bezier(.2,.9,.3,1.2);white-space:nowrap;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.toast.on{transform:translate(-50%,0)}
+.proto{font-family:'Pixelify Sans';font-size:10px;color:var(--dim);text-align:center;margin-top:24px;letter-spacing:.1em}
+.splash{position:absolute;inset:0;z-index:100;display:grid;place-items:center;background:var(--bg);transition:opacity .8s,visibility .8s}
+.splash.off{opacity:0;visibility:hidden}
+.splash .moon{width:80px;height:80px;border-radius:50%;box-shadow:inset -18px -6px 0 0 var(--moon);transform:rotate(-20deg);filter:drop-shadow(0 0 30px rgba(192,132,252,.9));animation:rise 1.4s cubic-bezier(.2,.8,.2,1)}
+.splash p{font-family:Cinzel;letter-spacing:.4em;font-size:13px;color:var(--mute);margin-top:18px;text-align:center;animation:fade 1.6s}
+@keyframes rise{from{transform:translateY(30px) rotate(-60deg);opacity:0}}
+@keyframes fade{from{opacity:0}}
+
+/* ===== responsive ===== */
+.brand,.sidefoot{display:none}
+@media (min-width:600px) and (max-width:899px){
+  .device{max-width:none}
+  .screen{padding-left:max(24px,calc((100% - 680px)/2));padding-right:max(24px,calc((100% - 680px)/2))}
+  .tabbar{padding-left:max(10px,calc((100% - 560px)/2));padding-right:max(10px,calc((100% - 560px)/2))}
+  .hero{max-width:420px;margin-left:auto;margin-right:auto}
+  .ncard{min-width:46%}
+  .items{grid-template-columns:repeat(3,1fr)}
+  .races{grid-template-columns:repeat(3,1fr)}
+  .grid2{grid-template-columns:repeat(4,1fr)}
+  .rbody{padding-left:max(26px,calc((100% - 640px)/2));padding-right:max(26px,calc((100% - 640px)/2))}
+  .sheetin{width:600px;margin:0 auto;border-radius:26px 26px 0 0}
+}
+@media (min-width:900px){
+  body{display:block}
+  .device{max-width:none;height:100vh}
+  .screens{left:260px;bottom:0}
+  .screen{padding:44px max(44px,calc((100% - 1060px)/2)) 60px}
+  h1{font-size:44px}
+  h2{font-size:22px}
+  /* sidebar */
+  .tabbar{top:0;bottom:0;right:auto;width:260px;height:auto;flex-direction:column;padding:26px 16px;background:rgba(12,6,22,.72);border-right:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+  .brand{display:flex;align-items:center;gap:12px;padding:0 8px 26px}
+  .brand img{width:52px;height:52px;border-radius:50%;box-shadow:0 0 24px rgba(168,85,247,.5)}
+  .brand b{font-family:UnifrakturMaguntia,Cinzel,serif;font-weight:400;font-size:26px;line-height:1;background:linear-gradient(180deg,#fff,#d8b4fe);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .brand small{display:block;font-family:'Pixelify Sans';font-size:10px;letter-spacing:.14em;color:var(--dim);margin-top:4px}
+  .tabbar .inner{flex:none;flex-direction:column;height:auto;background:none;border:0;backdrop-filter:none;-webkit-backdrop-filter:none;gap:4px}
+  .tab{flex:none;flex-direction:row;justify-content:flex-start;gap:14px;height:50px;padding:0 16px;font-size:14.5px;font-weight:500}
+  .tab .bdg{top:50%;right:16px;margin-top:-4px}
+  .sidefoot{display:block;margin-top:auto}
+  .sidefoot .card{padding:14px;margin-top:10px}
+  .sidefoot code{font-family:'Pixelify Sans';color:var(--ice);font-size:14px;display:block;margin:4px 0 10px}
+  .sidefoot .btn{width:100%}
+  .sidefoot .discord{margin-top:10px}
+  /* home */
+  #s-home>.top .avatar{display:none}
+  .homehead{display:grid;grid-template-columns:minmax(300px,420px) 1fr;gap:36px;align-items:center}
+  .hero{margin:0}
+  .hright .status{margin-top:0}
+  .ncar{display:grid;grid-template-columns:repeat(3,1fr);overflow:visible;margin:0;padding:0}
+  .ncard{min-width:0}
+  .ncard:nth-child(n+4){display:none}
+  #nlist{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+  .grid2{grid-template-columns:repeat(4,1fr)}
+  .featured{display:grid;grid-template-columns:1fr auto;align-items:end;gap:6px 24px}
+  .featured .btn{grid-row:1/4;grid-column:2;align-self:center}
+  /* lore & guide */
+  .races{grid-template-columns:repeat(3,1fr)}
+  #s-lore .timeline{max-width:760px}
+  #guideMain{display:grid;grid-template-columns:minmax(300px,380px) 1fr;gap:0 28px;align-items:start}
+  #guideMain .progress{grid-column:1}
+  #guideMain .steps{grid-column:1}
+  #guideMain h2{grid-column:2;grid-row:1;margin-top:0}
+  #accs{grid-column:2;grid-row:2/4}
+  #s-guide .search{max-width:520px}
+  .job{min-width:230px}
+  /* messages : deux volets */
+  
+  .chat{left:680px;transform:none;opacity:0;pointer-events:none;transition:opacity .3s;background:linear-gradient(#150a24,#0a0512)}
+  .chat.on{opacity:1;pointer-events:auto}
+  .chat .chead>.icobtn:first-child{display:none}
+  .m{max-width:62%}
+  /* shop */
+  .items{grid-template-columns:repeat(3,1fr)}
+  .shophero{max-width:none}
+  /* overlays */
+  .reader{left:260px}
+  .rbody{padding-left:max(30px,calc((100% - 720px)/2));padding-right:max(30px,calc((100% - 720px)/2))}
+  .rbar{padding-left:max(16px,calc((100% - 760px)/2));padding-right:max(16px,calc((100% - 760px)/2))}
+  .sheet{left:260px}
+  .sheetin{width:600px;margin:0 auto;bottom:24px;border-radius:26px;border:1px solid var(--line)}
+}
+@media (min-width:1300px){.items{grid-template-columns:repeat(4,1fr)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="device" id="device">
+  <canvas id="sky"></canvas>
+  <div class="fog"></div>
+
+  <div class="splash" id="splash"><div><div class="moon" style="margin:auto"></div><p>DYNASTY<br>CRAFT</p></div></div>
+  <div class="toast" id="toast"></div>
+
+  <div class="screens">
+    <!-- HOME -->
+    <section class="screen on" id="s-home">
+      <div class="top">
+        <div><button class="eyebrow greet" id="greet" onclick="openProfile()">Bonsoir, voyageur·euse</button><h1>Le Coven</h1></div>
+        <button class="avatar" id="avatar" onclick="openProfile()">☾</button>
+      </div>
+      <div class="homehead"><div class="hleft">
+      <div class="hero">
+        <img src="logo.jpg" alt="Dynasty Craft">
+      </div>
+      <div class="hcap">
+        <span class="pill" id="spill"><i class="dot"></i> <span id="stxt">Connexion au serveur…</span></span>
+        <p>« Là où Solaris tomba, la Forêt des Arbres Géants se souvient. »</p>
+      </div>
+      </div><div class="hright">
+      <div class="card status">
+        <div><b id="online">—</b><span>En jeu</span></div>
+        <div><b>1.21.1</b><span>Fabric</span></div>
+        <div><b>145</b><span>Ans après</span></div>
+      </div>
+      <div class="card copyip">
+        <div><div class="eyebrow" style="color:var(--dim)">Adresse du serveur</div><code>83.143.117.55:20643</code></div>
+        <button class="btn ghost" onclick="copyIp()">Copier</button>
+      </div>
+      <a class="card discord" href="https://discord.gg/wRcWaHzMAh" target="_blank" rel="noopener">
+        <span class="dico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.3 4.4A19.6 19.6 0 0 0 15.4 3l-.6 1.3a18 18 0 0 0-5.6 0L8.6 3a19.5 19.5 0 0 0-4.9 1.5C.6 9 0 13.6.3 18.1a19.8 19.8 0 0 0 6 3l1.3-2.1c-.7-.3-1.4-.6-2-1l.5-.4a14 14 0 0 0 11.8 0l.5.4c-.6.4-1.3.7-2 1l1.3 2.1a19.7 19.7 0 0 0 6-3c.5-5.2-.9-9.7-3.4-13.7zM8.7 15.3c-1.2 0-2.1-1.1-2.1-2.4s.9-2.4 2.1-2.4 2.2 1.1 2.1 2.4c0 1.3-.9 2.4-2.1 2.4zm6.6 0c-1.2 0-2.1-1.1-2.1-2.4s.9-2.4 2.1-2.4 2.2 1.1 2.1 2.4c0 1.3-.9 2.4-2.1 2.4z"/></svg></span>
+        <span style="flex:1"><b>Rejoindre le Discord</b><small>Annonces, entraide et vie du Coven</small></span>
+        <span class="chev">›</span>
+      </a>
+      </div></div>
+
+      <div class="sechead"><h2>Actualités</h2><button class="write" id="writeBtn" onclick="openEditor()" hidden>✎ Écrire</button></div>
+      <div class="ncar" id="ncar"></div>
+
+      <h2>Chronique à la une</h2>
+      <div class="card featured">
+        <span class="eyebrow" style="color:var(--blood)">Chapitre VII</span>
+        <h3>Le Coup d'État</h3>
+        <p>Une armée d'Ikiryo, d'ogres et de démons déferle sur Solaris. Les rues lumineuses ne sont plus qu'un désert de mousse…</p>
+        <button class="btn" onclick="openChap(6)">Lire la chronique →</button>
+      </div>
+
+      <h2>Accès rapide</h2>
+      <div class="grid2">
+        <button class="card tile" onclick="go('guide')"><span class="ic">🧭</span><b>Premiers pas</b><small>Rejoindre l'aventure</small></button>
+        <button class="card tile" onclick="go('guide');setTimeout(()=>openAcc('eco'),400)"><span class="ic">☾</span><b>MoonCoins</b><small>Banque & économie</small></button>
+        <button class="card tile" onclick="go('lore');setTimeout(()=>setSeg('races'),300)"><span class="ic">🧝</span><b>Les 9 races</b><small>Choisis ton sang</small></button>
+        <button class="card tile" onclick="go('guide');setTimeout(()=>openAcc('jobs'),400)"><span class="ic">⚒️</span><b>Métiers</b><small>9 voies, 1 destin</small></button>
+      </div>
+
+      <h2>Toutes les actualités</h2>
+      <div class="chips" id="chips"></div>
+      <div id="nlist"></div>
+      <div class="proto">DYNASTY CRAFT · V1</div>
+    </section>
+
+    <!-- LORE -->
+    <section class="screen" id="s-lore">
+      <div class="top"><div><div class="eyebrow">Archives du Conseil</div><h1>Chroniques</h1></div></div>
+      <div class="card seg" id="seg">
+        <button class="on" data-k="time" onclick="setSeg('time')">Chronologie</button>
+        <button data-k="races" onclick="setSeg('races')">Races</button>
+      </div>
+      <div id="seg-time"><div class="timeline" id="timeline"></div></div>
+      <div id="seg-races" hidden><p class="sub" style="margin:0 0 12px">Chaque aventurier porte jusqu'à deux sangs. Le choix est définitif : <code style="font-family:'Pixelify Sans';color:var(--ice)">/setrace</code>.</p><div class="races" id="races"></div></div>
+    </section>
+
+    <!-- GUIDE -->
+    <section class="screen" id="s-guide">
+      <div class="top"><div><div class="eyebrow">Grimoire du joueur</div><h1>Guide</h1></div></div>
+      <div class="card search"><span>🔍</span><input id="q" placeholder="Chercher : banque, ville, métier…" oninput="filterGuide()"></div>
+      <div id="guideMain">
+        <div class="card progress"><div class="ring" id="ring"><span id="ringTxt">0/7</span></div><div><b style="font-family:Cinzel">Premiers pas</b><div class="sub" style="font-size:13px">Coche chaque étape au fur et à mesure.</div></div></div>
+        <div class="card steps" id="steps"></div>
+        <h2>Le grimoire</h2>
+        <div id="accs"></div>
+      </div>
+      <div id="guideSearch" hidden><div class="card" style="padding:4px 14px" id="results"></div></div>
+    </section>
+
+    <!-- MESSAGES -->
+    <section class="screen" id="s-msg">
+      <div class="top"><div><div class="eyebrow">Corbeaux du Coven</div><h1>Messages</h1></div></div>
+      <div class="card ingame"><span style="font-size:22px">🕯️</span><div><b>Lié au jeu.</b> Un joueur hors ligne reçoit ton message à sa prochaine connexion, directement dans le tchat Minecraft.</div></div>
+      <div class="card shophero" style="margin-top:4px"><div class="soon">BIENTÔT</div><div style="font-size:54px;margin:6px 0 10px">🪶</div><h3 style="font-size:20px">Les Corbeaux arrivent</h3><p class="sub" style="margin:8px 0 0">Bientôt, connecte-toi avec Discord pour écrire aux autres joueurs, discuter avec ta ville et recevoir tes messages directement en jeu.</p></div>
+      <a class="card discord" href="https://discord.gg/wRcWaHzMAh" target="_blank" rel="noopener" style="margin-top:14px"><span class="dico">💬</span><span style="flex:1"><b>En attendant, rejoins le Discord</b><small>Toute la communauté y est déjà</small></span><span class="chev">›</span></a>
+      <div class="convs" id="convs" hidden></div>
+    </section>
+
+    <!-- SHOP -->
+    <section class="screen" id="s-shop">
+      <div class="top"><div><div class="eyebrow">Échoppe des Sorcières</div><h1>Boutique</h1></div></div>
+      <div class="card shophero"><div class="soon">BIENTÔT</div><div class="orb"></div><h3 style="font-size:20px">Cosmétiques du Coven</h3><p class="sub" style="margin:6px 0 0">Ajoute tes coups de cœur à ta liste : <span id="notifTxt">tu recevras une alerte à l'ouverture.</span></p></div>
+      <h2>Aperçu de la collection</h2>
+      <div class="items" id="items"></div>
+      <div class="card fair"><span style="font-size:22px">⚖️</span><div><b style="color:var(--ink)">Purement cosmétique.</b> Rien de ce qui est vendu ici ne donne d'avantage en jeu. Le style, oui ; la puissance, jamais.</div></div>
+      <div class="proto">PRIX INDICATIFS · BOUTIQUE NON OUVERTE</div>
+    </section>
+  </div>
+
+  <!-- reader -->
+  <div class="reader" id="reader">
+    <div class="rbar"><button class="icobtn" onclick="closeReader()">✕</button><div class="prog"><i id="rprog"></i></div><span class="eyebrow" id="rnum" style="color:var(--dim)">1/8</span></div>
+    <div class="rbody" id="rbody"></div>
+  </div>
+
+  <!-- chat -->
+  <div class="chat" id="chat">
+    <div class="chead"><button class="icobtn" onclick="closeChat()">←</button><div class="cv" style="padding:0;margin:0"><div class="av" id="cav"></div></div><div style="flex:1"><b id="cname"></b><small id="cstat"></small></div><button class="icobtn" onclick="toast('📍 Position partagée — bientôt')">📍</button></div>
+    <div class="msgs" id="msgs"><div class="typing" id="typing"><i></i><i></i><i></i></div></div>
+    <div class="quick" id="quick"></div>
+    <form class="compose" onsubmit="send(event)"><input id="mi" placeholder="Envoyer un corbeau…" autocomplete="off"><button class="send" type="submit">➤</button></form>
+  </div>
+
+  <div class="sheet" id="sheet">
+    <div class="sheetin">
+      <div class="grab"></div>
+      <div class="top" style="margin-bottom:10px"><div><div class="eyebrow">Espace Créatrice</div><h3 style="font-size:20px">Nouvel article</h3></div><button class="icobtn" onclick="closeEditor()">✕</button></div>
+      <div class="ecover" id="ecover"><span id="ecic">🌙</span><b id="ectit">Titre de l'article</b></div>
+      <div class="themes" id="themes"></div>
+      <label class="fl">Catégorie<div class="chips" id="ecat"></div></label>
+      <label class="fl">Titre<input id="et" maxlength="80" placeholder="Ex. : La Roue du Coven fait peau neuve" oninput="prevCover()"></label>
+      <label class="fl">Résumé (une phrase)<input id="es" maxlength="140" placeholder="Ce que les joueurs verront dans la liste"></label>
+      <label class="fl">Texte<textarea id="eb" rows="7" placeholder="Écris ton article ici.&#10;&#10;Saute une ligne pour un nouveau paragraphe.&#10;- une ligne qui commence par un tiret = une liste&#10;**entre doubles étoiles** = en gras"></textarea></label>
+      <div class="rnav"><button class="btn ghost" onclick="previewArticle()">Aperçu</button><button class="btn" onclick="publish()">Publier</button></div>
+      <p class="sub" style="font-size:12px;margin:12px 0 0;text-align:center">« Publier » prépare le fichier actualites.json complet : colle-le à la place de l'ancien sur GitHub.</p>
+    </div>
+  </div>
+
+  <div class="sheet" id="psheet" onclick="if(event.target===this)closeProfile()">
+    <div class="sheetin">
+      <div class="grab"></div>
+      <div class="top" style="margin-bottom:14px"><div><div class="eyebrow">Ton profil</div><h3 style="font-size:20px">Comment t'appeler ?</h3></div><button class="icobtn" onclick="closeProfile()">✕</button></div>
+      <label class="fl">Pseudo Minecraft (facultatif)<input id="ppseudo" maxlength="16" placeholder="Ex. : Lunaria" oninput="prevProfile()"></label>
+      <div class="fl">Accord souhaité</div>
+      <div class="pron" id="pron"></div>
+      <div class="card" style="padding:14px;margin-top:14px"><div class="eyebrow" style="color:var(--dim)">Aperçu</div><div id="pprev" style="font-family:'Cormorant Garamond',serif;font-size:19px;margin-top:6px"></div></div>
+      <button class="btn" style="width:100%;margin-top:14px" onclick="saveProfile()">Enregistrer</button>
+      <p class="sub" style="font-size:12px;margin:12px 0 0;text-align:center">Plus tard, ces choix seront liés à ton compte Discord et suivront ton profil partout dans l'app.</p>
+    </div>
+  </div>
+
+  <div class="sheet" id="copybox" onclick="if(event.target===this)this.classList.remove('on')">
+    <div class="sheetin">
+      <div class="grab"></div>
+      <div class="top" style="margin-bottom:10px"><div><div class="eyebrow">Dernière étape</div><h3 style="font-size:20px">Publier sur GitHub</h3></div><button class="icobtn" onclick="$('#copybox').classList.remove('on')">✕</button></div>
+      <p class="sub" style="margin:0 0 10px">1. Copie le fichier ci-dessous.<br>2. Sur GitHub, ouvre <b>actualites.json</b> → ✏️ → efface tout → colle.<br>3. « Commit changes ». Le site se met à jour en une minute environ.</p>
+      <textarea id="cbtxt" readonly style="width:100%;height:180px;border-radius:12px;background:rgba(0,0,0,.35);border:1px solid var(--line);padding:10px;font-family:monospace;font-size:11px;color:var(--mute)"></textarea>
+      <button class="btn" style="width:100%;margin-top:12px" onclick="copyFile()">Copier le fichier</button>
+    </div>
+  </div>
+
+  <nav class="tabbar">
+    <div class="brand"><img src="logo.jpg" alt=""><div><b>Dynasty</b><small>MOONSISTERS COVEN</small></div></div>
+    <div class="inner" id="tabs">
+    <div class="glider" id="glider"></div>
+    <button class="tab on" data-t="home" onclick="go('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a7 7 0 1 0 9 9 6 6 0 0 1-9-9z"/></svg>Coven</button>
+    <button class="tab" data-t="lore" onclick="go('lore')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5M9 7h6M9 11h6"/></svg>Chroniques</button>
+    <button class="tab" data-t="guide" onclick="go('guide')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg>Guide</button>
+    <button class="tab" data-t="msg" onclick="go('msg')"><span class="bdg" id="mbdg" hidden></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>Messages</button>
+    <button class="tab" data-t="shop" onclick="go('shop')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.6 6.4L21 9l-5 4.4L17.5 20 12 16.6 6.5 20 8 13.4 3 9l6.4-.6z"/></svg>Boutique</button>
+  </div>
+    <div class="sidefoot">
+      <div class="card"><div class="eyebrow" style="color:var(--dim)">Rejoindre le serveur</div><code>83.143.117.55:20643</code><button class="btn" onclick="copyIp()">Copier l'adresse</button></div>
+      <a class="card discord" href="https://discord.gg/wRcWaHzMAh" target="_blank" rel="noopener" style="padding:10px 12px"><span class="dico" style="width:34px;height:34px"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.3 4.4A19.6 19.6 0 0 0 15.4 3l-.6 1.3a18 18 0 0 0-5.6 0L8.6 3a19.5 19.5 0 0 0-4.9 1.5C.6 9 0 13.6.3 18.1a19.8 19.8 0 0 0 6 3l1.3-2.1c-.7-.3-1.4-.6-2-1l.5-.4a14 14 0 0 0 11.8 0l.5.4c-.6.4-1.3.7-2 1l1.3 2.1a19.7 19.7 0 0 0 6-3c.5-5.2-.9-9.7-3.4-13.7zM8.7 15.3c-1.2 0-2.1-1.1-2.1-2.4s.9-2.4 2.1-2.4 2.2 1.1 2.1 2.4c0 1.3-.9 2.4-2.1 2.4zm6.6 0c-1.2 0-2.1-1.1-2.1-2.4s.9-2.4 2.1-2.4 2.2 1.1 2.1 2.4c0 1.3-.9 2.4-2.1 2.4z"/></svg></span><span style="flex:1"><b style="font-size:13.5px">Discord</b></span><span class="chev">›</span></a>
+    </div>
+  </nav>
+</div>
+
+<script>
+/* ---------- data ---------- */
+let CHAPS=[
+ {era:"An I · L'Aube",c:"var(--gold)",t:"Les Créatrices Primordiales",s:"Avant Solaris, il y avait les Sorcières. Et une poignée d'humains qui rêvaient.",p:[
+  "Dans les livres d'histoire, Solaris fut construite grâce aux Sorcières. Elles étaient les Créatrices Primordiales de tout.",
+  "Des aventuriers, pionniers de leurs rêves, se regroupèrent là où se dresse aujourd'hui le bâtiment du Conseil. Ils jurèrent de bâtir un endroit sain, où chaque individu serait accepté.",
+  "À la belle étoile, autour d'un feu mille fois crépitant, ils s'endormirent pour la dernière fois sans abri. Les livres ne disent rien de leurs origines. Ils ne mentionnent qu'une chose : leur race. Des humains."]},
+ {era:"Les premières années",c:"var(--gold)",t:"Le Pays de Solaris",s:"Des colons de toutes les contrées, unis par les Valeurs Fondamentales.",p:[
+  "Le village grandit grâce aux colons venus de toutes les contrées, de toutes les races, tous en accord avec les Valeurs Fondamentales.",
+  "Puis les Sorcières arrivèrent. Elles inventèrent des objets magiques, soulevèrent par leur art les structures les plus lourdes. Le village devint une ville.",
+  "Et la ville devint si vaste qu'on finit par l'appeler « le Pays de Solaris »."]},
+ {era:"La Trahison",c:"var(--violet)",t:"La mort du dernier Fondateur",s:"Quand le dernier aventurier s'éteint, le Conseil change les règles.",p:[
+  "Au décès du dernier aventurier fondateur, Solaris commença à changer.",
+  "Ceux qui tenaient le pouvoir modifièrent certaines lois, en ajoutèrent d'autres, fermèrent les yeux sur toutes les discriminations. Les Sorcières, jadis si respectées, devinrent les esclaves du Conseil et des Guildes.",
+  "Beaucoup se rebellèrent — surtout les descendants des premiers colons, ceux qui portaient encore la vision des Fondateurs."]},
+ {era:"Les années de sang",c:"var(--blood)",t:"La Guerre civile",s:"Des centaines de morts, des milliers de blessés, et la famine.",p:[
+  "Une guerre civile éclata. Le sang et la destruction en furent les mots d'ordre. Des centaines de victimes, des milliers de blessés… et la famine battait son plein.",
+  "Énormément de Sorcières s'enfuirent. La Créatrice sacrifia douze âmes de ses pairs pour créer une nouvelle dimension et leur permettre de fuir.",
+  "Quelques-unes furent gardées en captivité, pour engendrer de nouvelles générations où la magie coulerait dans le sang."]},
+ {era:"Le dernier souffle",c:"var(--blood)",t:"Les Esprits Vengeurs",s:"Une malédiction née de la haine des captives.",p:[
+  "Les captives moururent après des dizaines d'années de martyre, abusées, utilisées… le cœur rempli de haine, ne désirant que la vengeance.",
+  "De cette rage, elles tirèrent un dernier sort avant leur dernier souffle : la création d'une race nouvelle, encore méconnue.",
+  "Les Esprits Vengeurs."]},
+ {era:"145 ans plus tard",c:"var(--ice)",t:"La ville trop éclairée",s:"Néons, publicités… et une vérité que plus personne ne veut voir.",p:[
+  "La vie reprit son cours, mais les races restaient méfiantes et discriminantes. Les bâtards nés d'unions avec les Sorcières étaient exclus de leur propre clan.",
+  "Cent quarante-cinq ans passèrent. La technologie écrasa tout le reste : publicités, lumières colorées. Plus aucune rue n'était sombre — tout était bien trop éclairé.",
+  "La guerre civile devint chimère, la captivité des Sorcières une légende. Seuls quelques êtres à la longévité hors du commun, comme les Elfes, se souvenaient… et voulaient que la vérité éclate."]},
+ {era:"La Chute",c:"var(--blood)",t:"Le Coup d'État",s:"Ikiryo, ogres et démons. Solaris réduite en poussière.",p:[
+  "Un jour, un envahisseur vint détruire Solaris avec une armée de créatures : des Ikiryo, des ogres, des démons… Ils tuèrent chaque être vivant sur leur passage.",
+  "Chair déchirée, os brisés, l'odeur des bûchers dressés pour les cadavres. Les rues autrefois vivantes ne furent plus qu'un désert de mousse, où s'installèrent de nouveaux habitants.",
+  "C'était un Coup d'État, fomenté depuis fort longtemps par une personne puissante : haine, vengeance, argent, elle possédait tout. Le coupable, introuvable, continue de décimer, piller, détruire."]},
+ {era:"Aujourd'hui",c:"var(--moss)",t:"MoonSisters Coven",s:"Deux survivantes, une forêt de géants, un serment.",p:[
+  "Seuls quelques survivants parvinrent à fuir. Parmi eux, une mi-Elfe mi-Sorcière et une mi-humaine mi-Sorcière.",
+  "Dans une contrée reculée — la Forêt des Arbres Géants — elles bâtirent un village qu'elles nommèrent MoonSisters Coven.",
+  "Elles jurèrent de retrouver le coupable et de rebâtir la dynastie, celle où tout commença à Solaris. Ce serment, désormais, est aussi le tien."]}
+];
+const RACES=[["Humain","🛡️","Le sang des Fondateurs. Ni magie ni longévité — seulement la volonté."],["Sorcier·ère","🔮","Créatrices Primordiales, trahies puis chassées. La magie coule dans leurs veines."],["Elfe","🧝","Longévité hors du commun. Certains se souviennent encore de la guerre."],["Nain","⛏️","Maîtres de la pierre et du métal, gardiens des profondeurs."],["Orc","🪓","Force brute, honneur farouche. Mal-aimés de Solaris."],["Drakéide","🐉","Descendants des dragons, souffle et écailles."],["Vagabond","🎒","Sans terre ni clan. Le monde entier est leur foyer."],["Halfelin","🍀","Petits, discrets, et bien plus braves qu'on ne le croit."],["Gnome","⚙️","Inventeurs malicieux, à l'aise parmi les engrenages."]];
+const STEPS=[
+ ["Installer le modpack","Sur CurseForge, cherche « Dynasty Craft » et installe-le en un clic."],
+ ["Rejoindre le serveur","Copie l'adresse depuis l'accueil et ajoute-la dans Multijoueur."],
+ ["Rejoindre le Discord","<a href=\"https://discord.gg/wRcWaHzMAh\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--ice)\" onclick=\"event.stopPropagation()\">discord.gg/wRcWaHzMAh</a> — annonces et entraide."],
+ ["Récupérer ton kit","10 MoonCoins, les Chroniques de Solaris et 10 Jetons de Solaris t'attendent."],
+ ["Choisir ta race","<code>/setrace &lt;race1&gt; [race2]</code> — 2 races max, choix définitif."],
+ ["Rejoindre une ville","<code>/city list</code> puis <code>/city join &lt;nom&gt;</code> : tu deviens Colon."],
+ ["Prendre un métier","Il débloque primes, réductions chez le marchand et avantages exclusifs."],
+ ["Voter pour le serveur","2 Jetons de Solaris par vote, à dépenser à la Roue du Coven."]
+];
+const JOBS=[["🏗️","Builder","+ paysagiste","−20 % sur la construction chez le marchand, /vol 1 h par jour en ville, chantiers."],["🗺️","Bataillon d'exploration","+ mineur","+25 % sur minerais et pierres, chaussettes de lapin (saut et chute amortie)."],["🍲","Cuisinier","+ boulanger, poissonnier","Fours ×2 et plats payés dans la cuisine de ville."],["🌾","Fermier","+ tanneur, apiculteur","Primes sur les récoltes et l'élevage."],["📜","Enchanteur","+ alchimiste, libraire","+25 % / −15 % potions, livres, grimoires ; pommes de Notch −60 %."],["🔨","Forgeron","+ vendeur d'armures","Minerais d'armure +25 % / −15 %, livres enchantés −15 %."],["⚡","Ingénieur","—","Seul autorisé à poser la redstone ; chantiers sur catalogue avec /redstone."],["🐎","Maréchal-ferrant","—","Montures +25 %, chevaux vendus en laisse, œufs de chevaux."],["🪵","Bûcheron","—","Bois moddés +25 % / −15 %, FTB Ultimine réservé."]];
+const ACCS=[
+ {id:"eco",ic:"☾",t:"Banque & économie",k:"banque mooncoin solarcoin argent moneytrade marchand",html:`<div class="coins"><div class="coin"><div class="c" style="background:rgba(207,227,255,.12);color:var(--moon)">☾</div><b>MoonCoin</b><br><small style="color:var(--dim)">Salaires, maisons</small></div><div class="coin"><div class="c" style="background:rgba(240,192,96,.14);color:var(--gold)">✦</div><b>SolarCoin</b><br><small style="color:var(--dim)">Marchand</small></div></div>
+ <p style="margin:6px 0">100 SolarCoins = 1 MoonCoin. Change avec <code>/banque moneytrade mc|sc &lt;montant&gt;</code> (3 % de frais).</p>
+ <div class="conv">Convertir <input id="mcIn" type="number" value="2" min="0" oninput="calc()"> ☾ → <b id="scOut" style="color:var(--gold);font-family:'Pixelify Sans'">194 ✦</b></div>
+ <ul><li>Salaire fixe : 150 ☾/mois avec métier, 50 ☾ sans (selon ta présence).</li><li>Le marchand rachète à 50 % ; au-delà de 2000 ✦ par jour et par objet, il rachète moins.</li></ul>`},
+ {id:"jobs",ic:"⚒️",t:"Les 9 métiers",k:"metier métiers builder bucheron cuisinier fermier forgeron enchanteur ingenieur",html:`<p style="margin:0 0 10px">Glisse pour découvrir chaque voie →</p><div class="jobs">${JOBS.map(j=>`<div class="job"><div class="ic">${j[0]}</div><b>${j[1]}</b><small>${j[2]}</small><p>${j[3]}</p></div>`).join("")}</div>`},
+ {id:"city",ic:"🏰",t:"Villes",k:"ville city join colon fondateur",html:`<ul><li><code>/city list</code> — toutes les villes</li><li><code>/city info [nom]</code> — chef, habitants, territoire</li><li><code>/city join &lt;nom&gt;</code> — rejoindre (Exilé → Colon)</li><li><code>/city leave</code> — partir</li></ul><p style="margin:0">Certaines villes sont fermées : on n'y entre que sur invitation du chef.</p>`},
+ {id:"home",ic:"🏠",t:"Maisons & terrains",k:"maison terrain appartement achat prix",html:`<ul><li>Maison : 3 ☾ le bloc</li><li>Appartement : 2 ☾ le bloc</li><li>Terrain : 1 ☾ le bloc</li></ul><p style="margin:0">Les ateliers de métier ne sont jamais à vendre : le staff les attribue aux artisans.</p>`},
+ {id:"pass",ic:"🎖️",t:"Dynasty Pass & quêtes",k:"pass quete quêtes quotidienne cosmetique",html:`<p style="margin:0">Des quêtes quotidiennes liées à ton métier, des paliers à débloquer et un cosmétique du mois pour les plus assidus.</p>`},
+ {id:"wheel",ic:"🎡",t:"Roue du Coven",k:"roue vote jeton jetons solaris",html:`<p style="margin:0">Chaque vote rapporte 2 Jetons de Solaris. Fais tourner la roue pour gagner des récompenses — dont des blocs ultra rares.</p>`},
+ {id:"mobs",ic:"🌙",t:"Créatures & nuits",k:"monstre mob despawn sorcieres nuit",html:`<p style="margin:0">Toutes les 15 minutes, les Sorcières dispersent les créatures de Solaris : écoute les deux tintements d'améthyste. Les villes sont protégées des explosions de monstres.</p>`}
+];
+const CMDS=[["/setrace","Choisir sa race"],["/city list","Voir les villes"],["/city join","Rejoindre une ville"],["/city leave","Quitter sa ville"],["/city info","Infos d'une ville"],["/banque moneytrade","Changer MoonCoins ↔ SolarCoins"],["/salary info","Voir son salaire"],["/redstone","Chantiers redstone (Ingénieur)"],["/vol","Voler en ville (Builder)"]];
+const CONVS=[
+ {id:"ely",n:"Elyndra",i:"EL",g:"linear-gradient(135deg,#b48cff,#5b2bb8)",tag:"Elfe · Enchanteuse",on:true,unread:2,msgs:[["sys","Aujourd'hui"],["them","Tu as vu les nouvelles ruines près de l'ancien Conseil ?","20:31"],["them","J'y ai trouvé un livre… il parle des douze âmes 👀","20:32"]],rep:["Rendez-vous à la tour du Coven à la tombée de la nuit.","Ne le montre à personne. Certains au Conseil ne veulent pas qu'on sache.","J'apporte des potions, prends ta meilleure épée."]},
+ {id:"brok",n:"Brokk",i:"BK",g:"linear-gradient(135deg,#b0703a,#6b3b1a)",tag:"Nain · Forgeron",on:true,unread:1,msgs:[["them","Je vends 3 plastrons enchantés, 40 ☾ pièce. Intéressée ?","19:58"]],rep:["Marché conclu ! Passe à ma forge, côté est de la ville.","Pour toi, 35. Mais garde-le pour toi."]},
+ {id:"coven",n:"Ville · MoonSisters",i:"☾",g:"linear-gradient(135deg,#6a4fd8,#2a7fd6)",tag:"Groupe · 14",on:false,unread:0,msgs:[["sys","Canal de ville"],["them","Grand chantier samedi 21h : on restaure la place du marché !","Hier"]],rep:["Parfait, j'amène du bois de séquoia.","Les ingénieurs, prévoyez la redstone de la fontaine."]},
+ {id:"vyss",n:"Vyss",i:"VY",g:"linear-gradient(135deg,#7a2a3f,#2b0f1a)",tag:"Drakéide · Bataillon",on:false,unread:0,msgs:[["them","On part explorer les ruines au nord demain. Tu viens ?","Lun."]],rep:["Il y avait des Ikiryo la dernière fois. Sois prête.","Départ à l'aube, depuis la porte nord."]}
+];
+const ITEMS=[
+ {n:"Couronne de lune",k:"Chapeau",p:"350 ✦",r:["Légendaire","var(--gold)"],bg:"radial-gradient(circle at 50% 30%,rgba(207,227,255,.35),#162033)",svg:`<svg viewBox="0 0 64 64"><path d="M10 44l4-24 10 12 8-18 8 18 10-12 4 24z" fill="#dfe9ff" stroke="#9fb7e8" stroke-width="2"/><circle cx="32" cy="12" r="5" fill="#5cc8ff"/><rect x="10" y="44" width="44" height="7" rx="2" fill="#9fb7e8"/></svg>`},
+ {n:"Ailes d'Esprit Vengeur",k:"Dos",p:"600 ✦",r:["Mythique","var(--blood)"],bg:"radial-gradient(circle at 50% 40%,rgba(224,96,122,.35),#1c0d14)",svg:`<svg viewBox="0 0 64 64"><path d="M32 30C22 10 6 12 4 20c8 0 12 6 10 12 6-2 10 2 10 8 4-4 8-6 8-10z" fill="#3a1424" stroke="#e0607a" stroke-width="2"/><path d="M32 30c10-20 26-18 28-10-8 0-12 6-10 12-6-2-10 2-10 8-4-4-8-6-8-10z" fill="#3a1424" stroke="#e0607a" stroke-width="2"/></svg>`},
+ {n:"Familier corbeau",k:"Compagnon",p:"420 ✦",r:["Épique","var(--violet)"],bg:"radial-gradient(circle at 50% 40%,rgba(167,123,255,.35),#150f26)",svg:`<svg viewBox="0 0 64 64"><ellipse cx="30" cy="38" rx="16" ry="12" fill="#1d1830"/><circle cx="44" cy="26" r="9" fill="#1d1830"/><path d="M52 26l8 2-8 3z" fill="#f0c060"/><circle cx="46" cy="24" r="2" fill="#a77bff"/><path d="M16 36L4 30l10 12z" fill="#2b2445"/></svg>`},
+ {n:"Traînée de papillons",k:"Particules",p:"200 ✦",r:["Rare","var(--ice)"],bg:"radial-gradient(circle at 50% 50%,rgba(244,114,182,.3),#1f0c24)",svg:`<svg viewBox="0 0 64 64"><g fill="#f0c6ff"><circle cx="14" cy="44" r="3"/><circle cx="26" cy="34" r="4"/><circle cx="38" cy="38" r="2.5"/><circle cx="46" cy="24" r="4.5"/><circle cx="20" cy="20" r="2"/><circle cx="54" cy="44" r="2"/></g></svg>`},
+ {n:"Cape du Coven",k:"Bannière de dos",p:"—",r:["Exclusif Pass","var(--moss)"],bg:"radial-gradient(circle at 50% 30%,rgba(192,132,252,.3),#170d26)",svg:`<svg viewBox="0 0 64 64"><path d="M16 10h32l-4 44-12-6-12 6z" fill="#2e1650" stroke="#c084fc" stroke-width="2"/><path d="M32 22a7 7 0 1 0 6 10 5 5 0 0 1-6-10z" fill="#cfe3ff"/></svg>`},
+ {n:"Lanterne spectrale",k:"Main secondaire",p:"280 ✦",r:["Épique","var(--violet)"],bg:"radial-gradient(circle at 50% 50%,rgba(167,123,255,.3),#120f20)",svg:`<svg viewBox="0 0 64 64"><rect x="24" y="8" width="16" height="6" rx="2" fill="#4b4466"/><rect x="20" y="14" width="24" height="34" rx="4" fill="#2a2440" stroke="#a77bff" stroke-width="2"/><ellipse cx="32" cy="31" rx="6" ry="9" fill="#a77bff" opacity=".9"/><rect x="22" y="48" width="20" height="5" rx="2" fill="#4b4466"/></svg>`}
+];
+/* note: une "cape" Minecraft ne peut pas être vendue (règles Mojang) — ici offerte via le Pass, pas vendue */
+
+const CATS={"Mise à jour":"#c084fc","Lore":"#f0c060","Événement":"#f472b6","Économie":"#7ee0a0"};
+const THEMES=[["🌙","linear-gradient(135deg,#3b1d6e,#140a24)"],["🔮","linear-gradient(135deg,#6d28d9,#c026d3)"],["🏰","linear-gradient(135deg,#1e3a8a,#3b1d6e)"],["⚔️","linear-gradient(135deg,#7f1d3a,#2a0a1a)"],["✦","linear-gradient(135deg,#a16207,#3b1d6e)"],["🦋","linear-gradient(135deg,#db2777,#6d28d9)"]];
+let NEWS=[
+ {id:"refonte",cat:"Mise à jour",date:"2026-11-02",ic:"⚒️",g:"linear-gradient(135deg,#6d28d9,#c026d3)",t:"La grande refonte RPG est arrivée",s:"9 métiers repensés, le SolarCoin, des quêtes de métier et du butin exclusif.",b:"Solaris se relève, et avec elle, ses artisans. La refonte RPG change en profondeur la vie de chaque aventurier.\n\n**Ce qui change :**\n- 9 métiers fusionnés : Builder, Bataillon d'exploration, Cuisinier, Fermier, Enchanteur, Forgeron, Ingénieur, Maréchal-ferrant, Bûcheron\n- Le **SolarCoin ✦** rejoint le MoonCoin : 100 ✦ = 1 ☾\n- Des quêtes quotidiennes propres à ton métier dans le Dynasty Pass\n- Du butin de métier caché dans les coffres\n\nChoisis bien ta voie : elle te suivra dans chaque recoin de la Forêt des Arbres Géants."},
+ {id:"vestiges",cat:"Mise à jour",date:"2026-10-30",ic:"🏚️",g:"linear-gradient(135deg,#3b1d6e,#140a24)",t:"Vestiges de Solaris : 524 blocs de ruines",s:"Portes brisées, poutres tombées, lustres effondrés… Rebâtis ou souviens-toi.",b:"Le nouveau mod **Vestiges de Solaris** ajoute 524 blocs de décoration ravagés, pour raconter la chute de la ville jusque dans tes constructions.\n\n- Portes brisées, chaises cassées, volets déchirés dans toutes les essences de bois\n- Gravats et murs effondrés pour 30 pierres\n- Lanternes tombées, livres éparpillés, tas d'os, rideaux déchirés\n\nLes ruines ne sont pas qu'un décor. Elles sont la mémoire de ce qu'on nous a pris."},
+ {id:"coven",cat:"Lore",date:"2026-10-12",ic:"🌙",g:"linear-gradient(135deg,#db2777,#6d28d9)",t:"MoonSisters Coven est fondée",s:"Deux survivantes, un serment, et la première ville qui renaît dans la forêt.",b:"Ce soir-là, sous la lune, deux sœurs de sang mêlé ont planté la première pierre.\n\nMoonSisters Coven est désormais une ville officielle. Elle est le cœur de la résistance, le refuge de ceux que Solaris a rejetés : bâtards de Sorcières, exilés, survivants.\n\nTape **/city info MoonSisters Coven** pour découvrir ses habitants."},
+ {id:"roue",cat:"Événement",date:"2026-11-05",ic:"🎡",g:"linear-gradient(135deg,#a16207,#3b1d6e)",t:"Vote, gagne des Jetons, fais tourner la Roue",s:"Chaque vote rapporte 2 Jetons de Solaris. Des blocs ultra rares t'attendent.",b:"La Roue du Coven tourne pour ceux qui soutiennent le serveur.\n\n- **2 Jetons de Solaris** par vote\n- **10 Jetons + 3 ☾** pour le joueur du mois\n- Des blocs ultra rares parmi les gains\n\nPlus on vote, plus le Coven grandit. Merci à vous !"},
+ {id:"eco",cat:"Économie",date:"2026-11-04",ic:"☾",g:"linear-gradient(135deg,#1e3a8a,#3b1d6e)",t:"Une économie plus saine",s:"Salaire selon ta présence, frais de change, marchand plus juste.",b:"Pour que le MoonCoin garde sa valeur, l'économie a été rééquilibrée.\n\n- Le salaire fixe dépend de ta présence : 10 jours en jeu dans le mois pour le toucher en entier\n- Le change MoonCoin ↔ SolarCoin coûte **3 %**\n- Le marchand rachète moins quand on lui vend toujours le même objet le même jour\n\nLes fermes géantes ne font plus la loi : ce sont les artisans qui font vivre Solaris."}
+];
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{return JSON.parse(localStorage.getItem("dc_"+k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem("dc_"+k,JSON.stringify(v))}catch(e){}}};
+let tt;function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("on"),2200)}
+function buzz(){try{navigator.vibrate&&navigator.vibrate(8)}catch(e){}}
+
+/* nav */
+const ORDER=["home","lore","guide","msg","shop"];
+function go(t){buzz();document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.id==="s-"+t));
+ document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("on",b.dataset.t===t));
+ placeGlider();
+ if(t!=="msg"&&isDesk())$("#chat").classList.remove("on");
+ if(t==="msg") $("#mbdg").style.display="none";
+ try{history.replaceState(null,"","#"+t)}catch(e){}}
+
+const isDesk=()=>matchMedia("(min-width:900px)").matches;
+function placeGlider(){const t=document.querySelector(".tab.on"),g=$("#glider");if(!t)return;const dx=isDesk()?0:3,dy=isDesk()?0:5;
+ g.style.width=(t.offsetWidth-2*dx)+"px";g.style.height=(t.offsetHeight-2*dy)+"px";g.style.transform=`translate(${t.offsetLeft+dx}px,${t.offsetTop+dy}px)`}
+addEventListener("resize",()=>{placeGlider();if(!isDesk()&&!document.querySelector("#s-msg.on"))$("#chat").classList.remove("on")});
+/* home */
+function copyIp(){const ip="83.143.117.55:20643";(navigator.clipboard?navigator.clipboard.writeText(ip):Promise.reject()).then(()=>toast("✓ Adresse copiée"),()=>toast(ip))}
+const SERVER="83.143.117.55:20643";
+async function status(){try{const r=await fetch("https://api.mcsrvstat.us/3/"+SERVER);const d=await r.json();
+ if(d.online){$("#online").textContent=d.players?d.players.online:"0";$("#stxt").textContent="Serveur en ligne"+(d.players?` · ${d.players.online}/${d.players.max}`:"");$("#spill .dot").style.cssText=""}
+ else{$("#online").textContent="0";$("#stxt").textContent="Serveur hors ligne";$("#spill .dot").style.cssText="background:var(--blood);box-shadow:0 0 10px var(--blood);animation:none"}}
+ catch(e){$("#stxt").textContent="Statut indisponible ici";$("#spill .dot").style.cssText="background:var(--dim);box-shadow:none;animation:none"}}
+status();setInterval(status,60000);
+
+/* lore */
+const read=new Set(store.get("read",[]));
+function renderTimeline(){$("#timeline").innerHTML=CHAPS.map((c,i)=>`<button class="card chap" style="--c:${c.c}" onclick="openChap(${i})"><span class="era">${c.era}</span><h3>${c.t}</h3><p>${c.s}</p>${read.has(i)?'<span class="read">✓ lu</span>':''}</button>`).join("")}
+$("#races").innerHTML=RACES.map(r=>`<div class="card race"><div class="glyph">${r[1]}</div><b>${r[0]}</b><p>${r[2]}</p></div>`).join("");
+function setSeg(k){document.querySelectorAll("#seg button").forEach(b=>b.classList.toggle("on",b.dataset.k===k));$("#seg-time").hidden=k!=="time";$("#seg-races").hidden=k!=="races"}
+let cur=0;
+function openChap(i){cur=i;const c=CHAPS[i];read.add(i);store.set("read",[...read]);renderTimeline();
+ $("#rbody").innerHTML=`<div style="--c:${c.c}"><span class="era">${c.era}</span><h2>${c.t}</h2>${c.p.map(x=>`<p>${x}</p>`).join("")}<div class="orn">✦ ☾ ✦</div><div class="rnav">${i>0?`<button class="btn ghost" onclick="openChap(${i-1})">← Précédent</button>`:""}${i<CHAPS.length-1?`<button class="btn" onclick="openChap(${i+1})">Chapitre suivant →</button>`:`<button class="btn" onclick="closeReader();go('guide')">Commencer l'aventure →</button>`}</div></div>`;
+ $("#rbody").style.setProperty("--c",c.c);$("#rbody").scrollTop=0;$("#rnum").textContent=(i+1)+"/"+CHAPS.length;$("#rprog").style.width="0";$("#reader").classList.add("on")}
+function closeReader(){$("#reader").classList.remove("on")}
+$("#rbody").addEventListener("scroll",e=>{const b=e.target;$("#rprog").style.width=(b.scrollTop/Math.max(1,b.scrollHeight-b.clientHeight)*100)+"%"});
+
+/* guide */
+const done=new Set(store.get("steps",[]));
+function renderSteps(){$("#steps").innerHTML=STEPS.map((s,i)=>`<div class="step ${done.has(i)?"done":""}" onclick="toggleStep(${i})"><div class="check">${done.has(i)?"✓":""}</div><div><b>${s[0]}</b><small>${s[1]}</small></div></div>`).join("");
+ const p=Math.round(done.size/STEPS.length*100);$("#ring").style.background=`conic-gradient(var(--moss) ${p}%,rgba(255,255,255,.08) 0)`;$("#ringTxt").textContent=done.size+"/"+STEPS.length}
+function toggleStep(i){buzz();done.has(i)?done.delete(i):done.add(i);store.set("steps",[...done]);renderSteps();if(done.size===STEPS.length)toast("☾ Bienvenue au Coven, "+(prof.pseudo||P().nom)+" !")}
+$("#accs").innerHTML=ACCS.map(a=>`<div class="card acc" id="acc-${a.id}"><button onclick="openAcc('${a.id}',true)"><span class="ic">${a.ic}</span><b>${a.t}</b><span class="chev">›</span></button><div class="inner"><div><div class="content">${a.html}</div></div></div></div>`).join("");
+function openAcc(id,toggle){const el=$("#acc-"+id);const was=el.classList.contains("open");document.querySelectorAll(".acc").forEach(a=>a.classList.remove("open"));if(!(toggle&&was)){el.classList.add("open");setTimeout(()=>{const sc=$("#s-guide");sc.scrollTo({top:el.getBoundingClientRect().top-sc.getBoundingClientRect().top+sc.scrollTop-12,behavior:"smooth"})},120)}}
+function calc(){const v=+$("#mcIn").value||0;$("#scOut").textContent=Math.floor(v*100*0.97)+" ✦"}
+function norm(s){return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"")}
+function filterGuide(){const q=norm($("#q").value.trim());$("#guideMain").hidden=!!q;$("#guideSearch").hidden=!q;if(!q)return;
+ const a=ACCS.filter(x=>norm(x.t+" "+x.k).includes(q)).map(x=>`<div class="cmd" style="cursor:pointer" onclick="$('#q').value='';filterGuide();openAcc('${x.id}')"><b>${x.ic} ${x.t}</b><span>Ouvrir ›</span></div>`);
+ const c=CMDS.filter(x=>norm(x.join(" ")).includes(q)).map(x=>`<div class="cmd"><code>${x[0]}</code><span>${x[1]}</span></div>`);
+ $("#results").innerHTML=(a.join("")+c.join(""))||`<div class="empty">Aucun résultat pour « ${$("#q").value} ».<br>Demande au Coven dans Messages !</div>`}
+
+/* messages */
+function renderConvs(){$("#convs").innerHTML=CONVS.map(c=>{const last=[...c.msgs].reverse().find(m=>m[0]!=="sys");return `<button class="card cv" data-id="${c.id}" onclick="openChat('${c.id}')"><div class="av" style="background:${c.g}">${c.i}${c.on?'<i class="on"></i>':""}</div><div class="mid"><b>${c.n} <span class="tag">${c.tag.split(" · ")[0]}</span></b><small>${last[0]==="me"?"Toi : ":""}${last[1]}</small></div><div class="rt">${last[2]||""}${c.unread?`<br><span class="badge">${c.unread}</span>`:""}</div></button>`}).join("")}
+let cc=null;
+function openChat(id){buzz();cc=CONVS.find(c=>c.id===id);cc.unread=0;renderConvs();markActive();$("#cav").style.background=cc.g;$("#cav").textContent=cc.i;$("#cname").textContent=cc.n;$("#cstat").textContent=cc.on?"● En jeu · "+cc.tag:"Hors ligne · reçoit ton message à sa connexion";$("#cstat").style.color=cc.on?"var(--live)":"var(--dim)";
+ const box=$("#msgs");box.querySelectorAll(".m").forEach(n=>n.remove());cc.msgs.forEach(m=>addMsg(m,false));
+ $("#quick").innerHTML=["J'arrive !","Où es-tu ?","Merci ☾","/tpa ?"].map(q=>`<button onclick="$('#mi').value='${q}';send()">${q}</button>`).join("");
+ $("#chat").classList.add("on");setTimeout(()=>box.scrollTop=box.scrollHeight,50)}
+function closeChat(){$("#chat").classList.remove("on");renderConvs()}
+function markActive(){document.querySelectorAll(".cv[data-id]").forEach(b=>b.classList.toggle("act",cc&&b.dataset.id===cc.id))}
+function addMsg(m,anim=true){const d=document.createElement("div");d.className="m "+m[0];if(!anim)d.style.animation="none";d.innerHTML=m[0]==="sys"?m[1]:`${esc(m[1])}${m[2]?`<small>${m[2]}</small>`:""}`;const box=$("#msgs");box.insertBefore(d,$("#typing"));box.scrollTop=box.scrollHeight}
+function esc(s){return s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]))}
+function now(){const d=new Date();return d.getHours()+":"+String(d.getMinutes()).padStart(2,"0")}
+function send(e){e&&e.preventDefault();const v=$("#mi").value.trim();if(!v||!cc)return;buzz();const m=["me",v,now()];cc.msgs.push(m);addMsg(m);$("#mi").value="";
+ if(!cc.on){setTimeout(()=>addMsg(["sys","🕯️ Corbeau en attente — livré à sa connexion"]),500);return}
+ const t=$("#typing");setTimeout(()=>{t.classList.add("on");$("#msgs").scrollTop=1e6},600);
+ setTimeout(()=>{t.classList.remove("on");const r=["them",cc.rep[(cc.msgs.length)%cc.rep.length],now()];cc.msgs.push(r);addMsg(r)},2000+Math.random()*900)}
+
+/* shop */
+const wl=new Set(store.get("wish",[]));
+function renderItems(){$("#items").innerHTML=ITEMS.map((it,i)=>`<div class="card item"><span class="rar" style="background:rgba(0,0,0,.45);color:${it.r[1]}">${it.r[0]}</span><div class="prev" style="background:${it.bg}">${it.svg}</div><b>${it.n}</b><small>${it.k}</small><div class="row"><span class="price">${it.p}</span><button class="wish ${wl.has(i)?"on":""}" onclick="wish(${i})">${wl.has(i)?"♥":"♡"}</button></div></div>`).join("")}
+function wish(i){buzz();wl.has(i)?wl.delete(i):(wl.add(i),toast("♥ Ajouté à ta liste d'envies"));store.set("wish",[...wl]);renderItems()}
+
+
+
+/* profile & pronouns */
+const PRON={f:{lbl:"Elle",nom:"voyageuse",ex:"Sois la bienvenue, voyageuse.",notif:"tu seras prévenue à l'ouverture."},m:{lbl:"Il",nom:"voyageur",ex:"Sois le bienvenu, voyageur.",notif:"tu seras prévenu à l'ouverture."},n:{lbl:"Neutre",nom:"âme errante",ex:"Bienvenue à toi, âme errante.",notif:"tu recevras une alerte à l'ouverture."}};
+let prof=store.get("profil",{pr:null,pseudo:""});let ptmp=null;
+const P=()=>PRON[prof.pr||"n"];
+function hello(){const h=new Date().getHours();return h>=5&&h<18?"Bonjour":"Bonsoir"}
+function applyProfile(){$("#greet").textContent=hello()+", "+(prof.pseudo||(prof.pr?P().nom:"voyageur·euse"));
+ $("#avatar").textContent=prof.pseudo?prof.pseudo.slice(0,2).toUpperCase():"☾";$("#notifTxt").textContent=P().notif}
+function openProfile(){buzz();ptmp=prof.pr;$("#ppseudo").value=prof.pseudo||"";renderPron();$("#psheet").classList.add("on")}
+function closeProfile(){$("#psheet").classList.remove("on")}
+function renderPron(){$("#pron").innerHTML=Object.entries(PRON).map(([k,v])=>`<button class="${k===ptmp?'on':''}" onclick="ptmp='${k}';renderPron()"><b>${v.lbl}</b><small>${v.nom}</small></button>`).join("");prevProfile()}
+function prevProfile(){const v=PRON[ptmp||"n"],ps=$("#ppseudo").value.trim();$("#pprev").textContent=`${hello()}, ${ps||(ptmp?v.nom:"voyageur·euse")}. ${v.ex}`}
+function saveProfile(){prof={pr:ptmp,pseudo:$("#ppseudo").value.trim().replace(/[^A-Za-z0-9_]/g,"")};store.set("profil",prof);applyProfile();closeProfile();toast("✓ Profil enregistré")}
+
+/* news */
+let posts=store.get("posts",[]);let ncat="Tout";
+const allNews=()=>[...posts,...NEWS].sort((a,b)=>b.date.localeCompare(a.date));
+const fdate=d=>new Date(d+"T12:00").toLocaleDateString("fr-FR",{day:"numeric",month:"long"});
+const isNew=d=>(Date.now()-new Date(d+"T12:00"))/864e5<7;
+function catPill(c){return `<span class="cat" style="--cc:${CATS[c]||'#fff'}">${c}</span>`}
+function renderNews(){const A=allNews();
+ $("#ncar").innerHTML=A.slice(0,5).map(n=>`<button class="card ncard" onclick="openArticle('${n.id}')"><div class="cover" style="background:${n.g}">${catPill(n.cat)}<span class="big">${n.ic}</span></div><div class="nb"><b>${esc(n.t)}</b><p>${esc(n.s)}</p><span class="meta">${fdate(n.date)}${isNew(n.date)?'<span class="new">NOUVEAU</span>':''}</span></div></button>`).join("");
+ $("#chips").innerHTML=["Tout",...Object.keys(CATS)].map(c=>`<button class="${c===ncat?'on':''}" onclick="ncat='${c}';renderNews()">${c}</button>`).join("");
+ const L=A.filter(n=>ncat==="Tout"||n.cat===ncat);
+ $("#nlist").innerHTML=L.map(n=>`<button class="card nrow" onclick="openArticle('${n.id}')"><div class="th" style="background:${n.g}">${n.ic}</div><div style="flex:1;min-width:0"><span class="cat" style="--cc:${CATS[n.cat]}">${n.cat}</span><b style="margin-top:5px">${esc(n.t)}</b><small>${esc(n.s)}</small><span class="meta">${fdate(n.date)}</span></div></button>`).join("")||'<div class="empty">Aucun article dans cette catégorie.</div>'}
+function md(t){const out=[];let ul=[];const fl=()=>{if(ul.length){out.push("<ul>"+ul.map(x=>`<li>${x}</li>`).join("")+"</ul>");ul=[]}};
+ esc(t).split(/\n/).forEach(l=>{l=l.replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");if(/^\s*-\s+/.test(l))ul.push(l.replace(/^\s*-\s+/,""));else{fl();if(l.trim())out.push(`<p>${l}</p>`)}});fl();return out.join("")}
+function renderArticle(n,preview){const c=CATS[n.cat]||"var(--violet)";
+ $("#rbody").innerHTML=`<div><div class="ahead" style="background:${n.g}"><span class="big" style="animation:float 6s ease-in-out infinite">${n.ic}</span></div><span class="era" style="color:${c}">${n.cat} · ${fdate(n.date)}</span><h2>${esc(n.t)}</h2>${md(n.b)}<div class="orn">✦ ☾ ✦</div><div class="rnav">${preview?`<button class="btn ghost" onclick="closeReader();openEditor(true)">← Modifier</button><button class="btn" onclick="closeReader();publish()">Publier</button>`:`<button class="btn ghost" onclick="share('${n.id}')">Partager</button><button class="btn" onclick="closeReader()">Retour</button>`}</div></div>`;
+ $("#rbody").style.setProperty("--c",c);$("#rbody").scrollTop=0;$("#rnum").textContent=preview?"APERÇU":"";$("#rprog").style.width="0";$("#reader").classList.add("on")}
+function openArticle(id){buzz();renderArticle(allNews().find(n=>n.id===id))}
+function share(id){const n=allNews().find(x=>x.id===id);const txt=`${n.t} — ${n.s}`;(navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>toast("✓ Copié, colle-le sur Discord"),()=>toast("Copie impossible ici"))}
+/* editor */
+let eth=0,ecat="Mise à jour";
+function openEditor(keep){if(!keep){eth=0;ecat="Mise à jour"}
+ $("#themes").innerHTML=THEMES.map((t,i)=>`<button class="${i===eth?'on':''}" style="background:${t[1]}" onclick="eth=${i};openEditor(true)">${t[0]}</button>`).join("");
+ $("#ecat").innerHTML=Object.keys(CATS).map(c=>`<button type="button" class="${c===ecat?'on':''}" onclick="event.preventDefault();ecat='${c}';openEditor(true)">${c}</button>`).join("");
+ prevCover();$("#sheet").classList.add("on")}
+function closeEditor(){$("#sheet").classList.remove("on")}
+function prevCover(){$("#ecover").style.background=THEMES[eth][1];$("#ecic").textContent=THEMES[eth][0];$("#ectit").textContent=$("#et").value||"Titre de l'article"}
+function draft(){const d=new Date();return{id:"p"+Date.now(),cat:ecat,date:d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"),ic:THEMES[eth][0],g:THEMES[eth][1],t:$("#et").value.trim(),s:$("#es").value.trim(),b:$("#eb").value.trim()}}
+function previewArticle(){const n=draft();if(!n.t){toast("Ajoute un titre");return}closeEditor();renderArticle(n,true)}
+function publish(){const n=draft();if(!n.t||!n.b){toast("Il faut au moins un titre et un texte");openEditor(true);return}
+ if(!n.s)n.s=n.b.replace(/\*\*/g,"").split("\n")[0].slice(0,120);
+ n.id=n.t.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40)||n.id;
+ const file=JSON.stringify([n,...NEWS],null,2);closeEditor();$("#cbtxt").value=file;$("#copybox").classList.add("on")}
+function copyFile(){const t=$("#cbtxt");(navigator.clipboard?navigator.clipboard.writeText(t.value):Promise.reject()).then(()=>toast("✓ Copié ! Colle-le dans actualites.json sur GitHub"),()=>{t.select();toast("Sélectionne tout et copie")})}
+fetch("chroniques.json",{cache:"no-cache"}).then(r=>r.ok?r.json():Promise.reject()).then(d=>{if(Array.isArray(d)&&d.length){CHAPS=d;renderTimeline()}}).catch(()=>{});
+fetch("actualites.json",{cache:"no-cache"}).then(r=>r.ok?r.json():Promise.reject()).then(d=>{if(Array.isArray(d)&&d.length){NEWS=d;renderNews()}}).catch(()=>{});
+
+/* sky: stars + fireflies */
+const cv=$("#sky"),ctx=cv.getContext("2d");let W,H,stars=[],flies=[];
+function rs(){const r=devicePixelRatio||1,b=$("#device").getBoundingClientRect();W=b.width;H=b.height;cv.width=W*r;cv.height=H*r;cv.style.width=W+"px";cv.style.height=H+"px";ctx.setTransform(r,0,0,r,0,0);
+ stars=Array.from({length:90},()=>({x:Math.random()*W,y:Math.random()*H*.6,r:Math.random()*1.2+.2,p:Math.random()*6}));
+ flies=Array.from({length:21},()=>({x:Math.random()*W,y:H*.4+Math.random()*H*.6,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,p:Math.random()*6}))}
+function bfly(x,y,sz,flap,a,hue){ctx.save();ctx.translate(x,y);ctx.globalAlpha=a;ctx.shadowColor=`hsla(${hue},95%,75%,.9)`;ctx.shadowBlur=10;ctx.fillStyle=`hsla(${hue},90%,78%,.85)`;
+ const w=Math.abs(Math.cos(flap));for(const sgn of[-1,1]){ctx.save();ctx.scale(sgn*w,1);ctx.beginPath();ctx.ellipse(sz*.55,-sz*.35,sz*.55,sz*.4,-.5,0,7);ctx.fill();ctx.beginPath();ctx.ellipse(sz*.4,sz*.3,sz*.35,sz*.28,.5,0,7);ctx.fill();ctx.restore()}
+ ctx.fillStyle="#fff";ctx.fillRect(-.6,-sz*.5,1.2,sz);ctx.restore()}
+function tick(t){ctx.clearRect(0,0,W,H);ctx.shadowBlur=0;
+ stars.forEach(s=>{ctx.globalAlpha=.25+.6*Math.abs(Math.sin(t/1400+s.p));ctx.fillStyle=s.r>1.1?"#f5d0fe":"#ede4ff";ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,7);ctx.fill()});
+ flies.forEach((f,i)=>{f.x+=f.vx+Math.sin(t/900+f.p)*.18;f.y+=f.vy+Math.cos(t/1100+f.p)*.18;if(f.x<-10)f.x=W+10;if(f.x>W+10)f.x=-10;if(f.y<H*.25)f.y=H;if(f.y>H+10)f.y=H*.25;
+  const a=.35+.55*Math.max(0,Math.sin(t/900+f.p*2));
+  if(i%3===0){bfly(f.x,f.y,6+(i%4),t/120+f.p,a*.9,270+(i*13)%50)}
+  else{ctx.globalAlpha=1;const g=ctx.createRadialGradient(f.x,f.y,0,f.x,f.y,8);g.addColorStop(0,`rgba(232,180,255,${a})`);g.addColorStop(1,"rgba(232,180,255,0)");ctx.fillStyle=g;ctx.beginPath();ctx.arc(f.x,f.y,8,0,7);ctx.fill()}});
+ ctx.globalAlpha=1;requestAnimationFrame(tick)}
+addEventListener("resize",rs);
+
+/* init */
+if(location.hash==="#creatrice"){$("#writeBtn").hidden=false}
+addEventListener("hashchange",()=>{if(location.hash==="#creatrice")$("#writeBtn").hidden=false});
+if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+applyProfile();renderTimeline();renderNews();renderSteps();renderConvs();renderItems();rs();requestAnimationFrame(tick);placeGlider();setTimeout(placeGlider,300);document.fonts&&document.fonts.ready.then(placeGlider);
+const h=location.hash.slice(1);if(ORDER.includes(h))go(h);
+setTimeout(()=>$("#splash").classList.add("off"),1500);
+</script>
+</body>
+</html>

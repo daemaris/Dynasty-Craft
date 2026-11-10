@@ -1,0 +1,90 @@
+[
+  {
+    "era": "An I · L'Aube",
+    "c": "var(--gold)",
+    "t": "Les Créatrices Primordiales",
+    "s": "Avant Solaris, il y avait les Sorcières. Et une poignée d'humains qui rêvaient.",
+    "p": [
+      "Dans les livres d'histoire, Solaris fut construite grâce aux Sorcières. Elles étaient les Créatrices Primordiales de tout.",
+      "Des aventuriers, pionniers de leurs rêves, se regroupèrent là où se dresse aujourd'hui le bâtiment du Conseil. Ils jurèrent de bâtir un endroit sain, où chaque individu serait accepté.",
+      "À la belle étoile, autour d'un feu mille fois crépitant, ils s'endormirent pour la dernière fois sans abri. Les livres ne disent rien de leurs origines. Ils ne mentionnent qu'une chose : leur race. Des humains."
+    ]
+  },
+  {
+    "era": "Les premières années",
+    "c": "var(--gold)",
+    "t": "Le Pays de Solaris",
+    "s": "Des colons de toutes les contrées, unis par les Valeurs Fondamentales.",
+    "p": [
+      "Le village grandit grâce aux colons venus de toutes les contrées, de toutes les races, tous en accord avec les Valeurs Fondamentales.",
+      "Puis les Sorcières arrivèrent. Elles inventèrent des objets magiques, soulevèrent par leur art les structures les plus lourdes. Le village devint une ville.",
+      "Et la ville devint si vaste qu'on finit par l'appeler « le Pays de Solaris »."
+    ]
+  },
+  {
+    "era": "La Trahison",
+    "c": "var(--violet)",
+    "t": "La mort du dernier Fondateur",
+    "s": "Quand le dernier aventurier s'éteint, le Conseil change les règles.",
+    "p": [
+      "Au décès du dernier aventurier fondateur, Solaris commença à changer.",
+      "Ceux qui tenaient le pouvoir modifièrent certaines lois, en ajoutèrent d'autres, fermèrent les yeux sur toutes les discriminations. Les Sorcières, jadis si respectées, devinrent les esclaves du Conseil et des Guildes.",
+      "Beaucoup se rebellèrent — surtout les descendants des premiers colons, ceux qui portaient encore la vision des Fondateurs."
+    ]
+  },
+  {
+    "era": "Les années de sang",
+    "c": "var(--blood)",
+    "t": "La Guerre civile",
+    "s": "Des centaines de morts, des milliers de blessés, et la famine.",
+    "p": [
+      "Une guerre civile éclata. Le sang et la destruction en furent les mots d'ordre. Des centaines de victimes, des milliers de blessés… et la famine battait son plein.",
+      "Énormément de Sorcières s'enfuirent. La Créatrice sacrifia douze âmes de ses pairs pour créer une nouvelle dimension et leur permettre de fuir.",
+      "Quelques-unes furent gardées en captivité, pour engendrer de nouvelles générations où la magie coulerait dans le sang."
+    ]
+  },
+  {
+    "era": "Le dernier souffle",
+    "c": "var(--blood)",
+    "t": "Les Esprits Vengeurs",
+    "s": "Une malédiction née de la haine des captives.",
+    "p": [
+      "Les captives moururent après des dizaines d'années de martyre, abusées, utilisées… le cœur rempli de haine, ne désirant que la vengeance.",
+      "De cette rage, elles tirèrent un dernier sort avant leur dernier souffle : la création d'une race nouvelle, encore méconnue.",
+      "Les Esprits Vengeurs."
+    ]
+  },
+  {
+    "era": "145 ans plus tard",
+    "c": "var(--ice)",
+    "t": "La ville trop éclairée",
+    "s": "Néons, publicités… et une vérité que plus personne ne veut voir.",
+    "p": [
+      "La vie reprit son cours, mais les races restaient méfiantes et discriminantes. Les bâtards nés d'unions avec les Sorcières étaient exclus de leur propre clan.",
+      "Cent quarante-cinq ans passèrent. La technologie écrasa tout le reste : publicités, lumières colorées. Plus aucune rue n'était sombre — tout était bien trop éclairé.",
+      "La guerre civile devint chimère, la captivité des Sorcières une légende. Seuls quelques êtres à la longévité hors du commun, comme les Elfes, se souvenaient… et voulaient que la vérité éclate."
+    ]
+  },
+  {
+    "era": "La Chute",
+    "c": "var(--blood)",
+    "t": "Le Coup d'État",
+    "s": "Ikiryo, ogres et démons. Solaris réduite en poussière.",
+    "p": [
+      "Un jour, un envahisseur vint détruire Solaris avec une armée de créatures : des Ikiryo, des ogres, des démons… Ils tuèrent chaque être vivant sur leur passage.",
+      "Chair déchirée, os brisés, l'odeur des bûchers dressés pour les cadavres. Les rues autrefois vivantes ne furent plus qu'un désert de mousse, où s'installèrent de nouveaux habitants.",
+      "C'était un Coup d'État, fomenté depuis fort longtemps par une personne puissante : haine, vengeance, argent, elle possédait tout. Le coupable, introuvable, continue de décimer, piller, détruire."
+    ]
+  },
+  {
+    "era": "Aujourd'hui",
+    "c": "var(--moss)",
+    "t": "MoonSisters Coven",
+    "s": "Deux survivantes, une forêt de géants, un serment.",
+    "p": [
+      "Seuls quelques survivants parvinrent à fuir. Parmi eux, une mi-Elfe mi-Sorcière et une mi-humaine mi-Sorcière.",
+      "Dans une contrée reculée — la Forêt des Arbres Géants — elles bâtirent un village qu'elles nommèrent MoonSisters Coven.",
+      "Elles jurèrent de retrouver le coupable et de rebâtir la dynastie, celle où tout commença à Solaris. Ce serment, désormais, est aussi le tien."
+    ]
+  }
+]
