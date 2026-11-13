@@ -1,5 +1,15 @@
 [
   {
+    "id": "maj-2026-11-14",
+    "cat": "Mise à jour",
+    "date": "2026-11-14",
+    "ic": "📜",
+    "g": "linear-gradient(135deg,#6d28d9,#c026d3)",
+    "t": "Mise à jour du 14/11/2026",
+    "s": "Taxe de 40 ☾ sur les terrains, chantiers des builders à 100 ☾, et l'app passe en libre service.",
+    "b": "**1. Taxes**\nJusqu'ici, un terrain à bâtir n'avait pas de taxe mensuelle, contrairement aux maisons primes. Les terrains (et les maisons starters) ont désormais une taxe de **40 ☾** par mois.\n\n**2. Builders**\nLe salaire par chantier passe de **10 ☾ à 100 ☾**. Les builders n'étaient pas correctement rémunérés, et pour les acheteurs, faire bâtir une maison était presque gratuit.\n\n**3. L'app**\nL'application passe en libre service ! Nous avons besoin de quelques personnes pour essayer la messagerie, encore en version bêta. Elle arrivera bientôt sur le Play Store :)\nPour l'instant, le site n'est accessible qu'en partageant son lien."
+  },
+  {
     "id": "refonte",
     "cat": "Mise à jour",
     "date": "2026-11-02",

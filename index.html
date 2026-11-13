@@ -4,14 +4,30 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b0614">
-<title>Dynasty Craft — L'app du Coven</title>
+<title>Dynasty Craft — Serveur Minecraft RPG · L'app du Coven</title>
 <link rel="icon" type="image/png" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="description" content="Dynasty Craft — serveur Minecraft RPG. Lore de Solaris, guide du modpack, actualités du Coven.">
+<meta name="description" content="Dynasty Craft, serveur Minecraft RPG français (Fabric 1.21.1) : sorcières, lore de Solaris, 9 métiers, villes et économie. Rejoins le Coven et rebâtis la dynastie.">
+<link rel="canonical" href="https://dynasty-craft.pages.dev/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="Dynasty Craft">
+<meta property="og:url" content="https://dynasty-craft.pages.dev/">
+<meta property="og:title" content="Dynasty Craft — Serveur Minecraft RPG">
+<meta property="og:description" content="Solaris est tombée. Rejoins le Coven et rebâtis la dynastie : sorcières, lore, 9 métiers, villes. Serveur français, modpack Fabric 1.21.1.">
+<meta property="og:image" content="https://dynasty-craft.pages.dev/apercu.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Logo Dynasty Craft : deux sorcières dans une forêt violette">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Dynasty Craft — Serveur Minecraft RPG">
+<meta name="twitter:description" content="Solaris est tombée. Rejoins le Coven et rebâtis la dynastie.">
+<meta name="twitter:image" content="https://dynasty-craft.pages.dev/apercu.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Dynasty Craft","alternateName":"Dynasty Craft — Serveur Minecraft RPG","url":"https://dynasty-craft.pages.dev/","inLanguage":"fr","description":"Serveur Minecraft RPG français : sorcières, lore de Solaris, métiers, villes.","sameAs":["https://discord.gg/wRcWaHzMAh","https://www.curseforge.com/minecraft/modpacks/dynasty-craft"]}</script>
 <meta name="apple-mobile-web-app-title" content="Dynasty">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=UnifrakturMaguntia&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Pixelify+Sans:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -73,6 +89,10 @@ h2{font-size:19px;font-weight:700;margin:26px 0 12px}
 .discord .dico{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:#5865f2;color:#fff;box-shadow:0 6px 18px rgba(88,101,242,.45)}
 .discord .dico svg{width:22px;height:22px}
 .discord b{display:block;font-size:14.5px}.discord small{color:var(--mute);font-size:12.5px}.discord .chev{color:var(--mute);font-size:20px}
+.kofi{display:flex;align-items:center;gap:12px;padding:12px 14px;margin-top:10px;text-decoration:none;color:inherit;background:linear-gradient(135deg,rgba(240,192,96,.16),rgba(244,114,182,.16));border-color:rgba(240,192,96,.3)}
+.kofi .kico{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:20px;background:linear-gradient(135deg,#f0c060,#f472b6);box-shadow:0 6px 18px rgba(240,160,96,.35)}
+.kofi b{display:block;font-size:14.5px}.kofi small{color:var(--mute);font-size:12.5px;line-height:1.35;display:block}.kofi .chev{color:var(--mute);font-size:20px}
+.sidefoot .kofi{margin-top:10px}
 .copyip code{font-family:'Pixelify Sans';color:var(--ice);font-size:15px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:12px;background:linear-gradient(135deg,#a855f7,#6d28d9);font-weight:600;font-size:14px;box-shadow:0 6px 20px rgba(139,61,255,.45)}
 .btn.ghost{background:rgba(255,255,255,.06);box-shadow:none;border:1px solid var(--line)}
@@ -174,6 +194,7 @@ h2{font-size:19px;font-weight:700;margin:26px 0 12px}
 .rbody h2{font-size:28px;margin:8px 0 18px;line-height:1.15}
 .rbody p{font-family:'Cormorant Garamond',serif;font-size:20px;line-height:1.6;color:#ece2fb;margin:0 0 18px}
 .rbody p:first-of-type::first-letter{font-family:Cinzel;font-size:58px;float:left;line-height:.9;margin:6px 10px 0 0;color:var(--c)}
+.rbody .art p:first-of-type::first-letter{font-family:inherit;font-size:inherit;float:none;margin:0;color:inherit;line-height:inherit}
 .rbody .orn{text-align:center;color:var(--dim);letter-spacing:.6em;margin:26px 0}
 .rnav{display:flex;gap:10px;margin-top:10px}
 .rnav button{flex:1}
@@ -204,6 +225,11 @@ h2{font-size:19px;font-weight:700;margin:26px 0 12px}
 .acc .inner>div{overflow:hidden}
 .acc .content{padding:0 16px 16px;font-size:14px;line-height:1.55;color:#ddd0f2}
 .acc .content ul{padding-left:18px;margin:8px 0}
+.gsteps{margin:4px 0;padding-left:0;list-style:none;counter-reset:g}
+.gsteps li{counter-increment:g;position:relative;padding:6px 0 6px 34px;border-bottom:1px dashed var(--line)}
+.gsteps li:last-child{border:0}
+.gsteps li::before{content:counter(g);position:absolute;left:0;top:6px;width:24px;height:24px;border-radius:8px;display:grid;place-items:center;font-family:'Pixelify Sans';font-size:13px;background:rgba(192,132,252,.2);color:var(--ice)}
+.gtip{margin-top:10px;padding:10px 12px;border-radius:12px;background:rgba(240,192,96,.1);border:1px solid rgba(240,192,96,.25);font-size:13px}
 .acc .content li{margin-bottom:6px}
 .coins{display:flex;gap:10px;margin:10px 0}
 .coin{flex:1;padding:12px;border-radius:14px;text-align:center;background:rgba(255,255,255,.04);border:1px solid var(--line)}
@@ -375,6 +401,7 @@ h2{font-size:19px;font-weight:700;margin:26px 0 12px}
 </style>
 </head>
 <body>
+<noscript><div style="padding:24px;color:#eee;font-family:sans-serif"><h1>Dynasty Craft — Serveur Minecraft RPG</h1><p>Serveur Minecraft RPG français (Fabric 1.21.1). Solaris, bâtie par les Sorcières, est tombée sous un Coup d'État. Deux survivantes ont fondé MoonSisters Coven dans la Forêt des Arbres Géants. Rejoins-les : 9 races, 9 métiers, villes, économie (MoonCoin et SolarCoin), quêtes et Dynasty Pass.</p><p>Adresse du serveur : 83.143.117.55:20643 — Discord : https://discord.gg/wRcWaHzMAh — Modpack : CurseForge « Dynasty Craft ».</p></div></noscript>
 <div class="device" id="device">
   <canvas id="sky"></canvas>
   <div class="fog"></div>
@@ -412,6 +439,11 @@ h2{font-size:19px;font-weight:700;margin:26px 0 12px}
         <span style="flex:1"><b>Rejoindre le Discord</b><small>Annonces, entraide et vie du Coven</small></span>
         <span class="chev">›</span>
       </a>
+      <a class="card kofi" href="https://ko-fi.com/dynastycraft" target="_blank" rel="noopener">
+        <span class="kico">☕</span>
+        <span style="flex:1"><b>Soutenir le Coven</b><small>Un café aide à garder le serveur en ligne · aucune contrepartie en jeu</small></span>
+        <span class="chev">›</span>
+      </a>
       </div></div>
 
       <div class="sechead"><h2>Actualités</h2><button class="write" id="writeBtn" onclick="openEditor()" hidden>✎ Écrire</button></div>
@@ -427,7 +459,7 @@ h2{font-size:19px;font-weight:700;margin:26px 0 12px}
 
       <h2>Accès rapide</h2>
       <div class="grid2">
-        <button class="card tile" onclick="go('guide')"><span class="ic">🧭</span><b>Premiers pas</b><small>Rejoindre l'aventure</small></button>
+        <button class="card tile" onclick="go('guide');setTimeout(()=>openAcc('modpack'),400)"><span class="ic">📦</span><b>Le modpack</b><small>Installer & mettre à jour</small></button>
         <button class="card tile" onclick="go('guide');setTimeout(()=>openAcc('eco'),400)"><span class="ic">☾</span><b>MoonCoins</b><small>Banque & économie</small></button>
         <button class="card tile" onclick="go('lore');setTimeout(()=>setSeg('races'),300)"><span class="ic">🧝</span><b>Les 9 races</b><small>Choisis ton sang</small></button>
         <button class="card tile" onclick="go('guide');setTimeout(()=>openAcc('jobs'),400)"><span class="ic">⚒️</span><b>Métiers</b><small>9 voies, 1 destin</small></button>
@@ -479,6 +511,7 @@ h2{font-size:19px;font-weight:700;margin:26px 0 12px}
       <h2>Aperçu de la collection</h2>
       <div class="items" id="items"></div>
       <div class="card fair"><span style="font-size:22px">⚖️</span><div><b style="color:var(--ink)">Purement cosmétique.</b> Rien de ce qui est vendu ici ne donne d'avantage en jeu. Le style, oui ; la puissance, jamais.</div></div>
+      <a class="card kofi" href="https://ko-fi.com/dynastycraft" target="_blank" rel="noopener" style="margin-top:14px"><span class="kico">☕</span><span style="flex:1"><b>En attendant, soutiens le Coven</b><small>Dons libres sur Ko-fi · aucune contrepartie en jeu</small></span><span class="chev">›</span></a>
       <div class="proto">PRIX INDICATIFS · BOUTIQUE NON OUVERTE</div>
     </section>
   </div>
@@ -548,6 +581,7 @@ h2{font-size:19px;font-weight:700;margin:26px 0 12px}
     <div class="sidefoot">
       <div class="card"><div class="eyebrow" style="color:var(--dim)">Rejoindre le serveur</div><code>83.143.117.55:20643</code><button class="btn" onclick="copyIp()">Copier l'adresse</button></div>
       <a class="card discord" href="https://discord.gg/wRcWaHzMAh" target="_blank" rel="noopener" style="padding:10px 12px"><span class="dico" style="width:34px;height:34px"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.3 4.4A19.6 19.6 0 0 0 15.4 3l-.6 1.3a18 18 0 0 0-5.6 0L8.6 3a19.5 19.5 0 0 0-4.9 1.5C.6 9 0 13.6.3 18.1a19.8 19.8 0 0 0 6 3l1.3-2.1c-.7-.3-1.4-.6-2-1l.5-.4a14 14 0 0 0 11.8 0l.5.4c-.6.4-1.3.7-2 1l1.3 2.1a19.7 19.7 0 0 0 6-3c.5-5.2-.9-9.7-3.4-13.7zM8.7 15.3c-1.2 0-2.1-1.1-2.1-2.4s.9-2.4 2.1-2.4 2.2 1.1 2.1 2.4c0 1.3-.9 2.4-2.1 2.4zm6.6 0c-1.2 0-2.1-1.1-2.1-2.4s.9-2.4 2.1-2.4 2.2 1.1 2.1 2.4c0 1.3-.9 2.4-2.1 2.4z"/></svg></span><span style="flex:1"><b style="font-size:13.5px">Discord</b></span><span class="chev">›</span></a>
+      <a class="card kofi" href="https://ko-fi.com/dynastycraft" target="_blank" rel="noopener" style="padding:10px 12px"><span class="kico" style="width:34px;height:34px;font-size:17px">☕</span><span style="flex:1"><b style="font-size:13.5px">Soutenir le Coven</b></span><span class="chev">›</span></a>
     </div>
   </nav>
 </div>
@@ -590,7 +624,7 @@ let CHAPS=[
 ];
 const RACES=[["Humain","🛡️","Le sang des Fondateurs. Ni magie ni longévité — seulement la volonté."],["Sorcier·ère","🔮","Créatrices Primordiales, trahies puis chassées. La magie coule dans leurs veines."],["Elfe","🧝","Longévité hors du commun. Certains se souviennent encore de la guerre."],["Nain","⛏️","Maîtres de la pierre et du métal, gardiens des profondeurs."],["Orc","🪓","Force brute, honneur farouche. Mal-aimés de Solaris."],["Drakéide","🐉","Descendants des dragons, souffle et écailles."],["Vagabond","🎒","Sans terre ni clan. Le monde entier est leur foyer."],["Halfelin","🍀","Petits, discrets, et bien plus braves qu'on ne le croit."],["Gnome","⚙️","Inventeurs malicieux, à l'aise parmi les engrenages."]];
 const STEPS=[
- ["Installer le modpack","Sur CurseForge, cherche « Dynasty Craft » et installe-le en un clic."],
+ ["Installer le modpack","Avec l'app CurseForge : <a href=\"https://www.curseforge.com/minecraft/modpacks/dynasty-craft\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--ice)\" onclick=\"event.stopPropagation()\">page du modpack</a> → Installer. <a href=\"#\" style=\"color:var(--ice)\" onclick=\"event.preventDefault();event.stopPropagation();openAcc('modpack')\">Guide détaillé</a>"],
  ["Rejoindre le serveur","Copie l'adresse depuis l'accueil et ajoute-la dans Multijoueur."],
  ["Rejoindre le Discord","<a href=\"https://discord.gg/wRcWaHzMAh\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--ice)\" onclick=\"event.stopPropagation()\">discord.gg/wRcWaHzMAh</a> — annonces et entraide."],
  ["Récupérer ton kit","10 MoonCoins, les Chroniques de Solaris et 10 Jetons de Solaris t'attendent."],
@@ -601,6 +635,22 @@ const STEPS=[
 ];
 const JOBS=[["🏗️","Builder","+ paysagiste","−20 % sur la construction chez le marchand, /vol 1 h par jour en ville, chantiers."],["🗺️","Bataillon d'exploration","+ mineur","+25 % sur minerais et pierres, chaussettes de lapin (saut et chute amortie)."],["🍲","Cuisinier","+ boulanger, poissonnier","Fours ×2 et plats payés dans la cuisine de ville."],["🌾","Fermier","+ tanneur, apiculteur","Primes sur les récoltes et l'élevage."],["📜","Enchanteur","+ alchimiste, libraire","+25 % / −15 % potions, livres, grimoires ; pommes de Notch −60 %."],["🔨","Forgeron","+ vendeur d'armures","Minerais d'armure +25 % / −15 %, livres enchantés −15 %."],["⚡","Ingénieur","—","Seul autorisé à poser la redstone ; chantiers sur catalogue avec /redstone."],["🐎","Maréchal-ferrant","—","Montures +25 %, chevaux vendus en laisse, œufs de chevaux."],["🪵","Bûcheron","—","Bois moddés +25 % / −15 %, FTB Ultimine réservé."]];
 const ACCS=[
+ {id:"modpack",ic:"📦",t:"Installer & mettre à jour le modpack",k:"modpack curseforge installer installation mise a jour mettre a jour update version mods incompatible launcher",html:`<p style="margin:0 0 6px"><b>Installer (une seule fois)</b></p>
+ <ol class="gsteps"><li>Télécharge et installe <a href="https://www.curseforge.com/download/app" target="_blank" rel="noopener" style="color:var(--ice)">l'app CurseForge</a>, puis choisis <b>Minecraft</b>.</li>
+ <li>Ouvre la <a href="https://www.curseforge.com/minecraft/modpacks/dynasty-craft" target="_blank" rel="noopener" style="color:var(--ice)">page du modpack Dynasty Craft</a> (ou cherche « Dynasty Craft » dans l'app) et clique sur <b>Installer</b>.</li>
+ <li>Clique sur <b>Jouer</b>, connecte-toi avec ton compte Microsoft.</li>
+ <li>Multijoueur → Ajouter un serveur → adresse <code>83.143.117.55:20643</code>.</li></ol>
+ <p style="margin:12px 0 6px"><b>Mettre à jour (à chaque nouvelle version)</b></p>
+ <ol class="gsteps"><li>Ferme Minecraft.</li>
+ <li>Dans l'app CurseForge : <b>Minecraft → Mes modpacks</b>.</li>
+ <li>Sur la carte <b>Dynasty Craft</b>, un bouton <b>Mettre à jour</b> apparaît quand une nouvelle version est sortie : clique dessus, puis confirme.</li>
+ <li>Relance avec <b>Jouer</b>. C'est tout !</li></ol>
+ <div class="gtip">💡 Une nouvelle version est annoncée dans les <b>Actualités</b> et sur le Discord. Ton monde solo, tes captures et tes réglages restent en place ; si tu as ajouté tes propres mods, vérifie qu'ils sont toujours là après la mise à jour.</div>
+ <p style="margin:12px 0 6px"><b>En cas de souci</b></p>
+ <ul><li><b>« Mods incompatibles » ou refus de connexion</b> : ton modpack n'est pas à jour → mets-le à jour (ci-dessus).</li>
+ <li><b>Pas de bouton Mettre à jour</b> : clique sur les <b>⋮</b> de la carte → « Vérifier les mises à jour », ou redémarre l'app CurseForge.</li>
+ <li><b>Le jeu plante au lancement</b> : dans les ⋮ de la carte, essaie « Réparer » ; sinon donne au moins 6 Go de mémoire (Paramètres → Minecraft → Mémoire allouée).</li>
+ <li>Toujours bloqué·e ? Demande sur le <a href="https://discord.gg/wRcWaHzMAh" target="_blank" rel="noopener" style="color:var(--ice)">Discord</a> avec une capture d'écran.</li></ul>`},
  {id:"eco",ic:"☾",t:"Banque & économie",k:"banque mooncoin solarcoin argent moneytrade marchand",html:`<div class="coins"><div class="coin"><div class="c" style="background:rgba(207,227,255,.12);color:var(--moon)">☾</div><b>MoonCoin</b><br><small style="color:var(--dim)">Salaires, maisons</small></div><div class="coin"><div class="c" style="background:rgba(240,192,96,.14);color:var(--gold)">✦</div><b>SolarCoin</b><br><small style="color:var(--dim)">Marchand</small></div></div>
  <p style="margin:6px 0">100 SolarCoins = 1 MoonCoin. Change avec <code>/banque moneytrade mc|sc &lt;montant&gt;</code> (3 % de frais).</p>
  <div class="conv">Convertir <input id="mcIn" type="number" value="2" min="0" oninput="calc()"> ☾ → <b id="scOut" style="color:var(--gold);font-family:'Pixelify Sans'">194 ✦</b></div>
@@ -632,6 +682,7 @@ const ITEMS=[
 const CATS={"Mise à jour":"#c084fc","Lore":"#f0c060","Événement":"#f472b6","Économie":"#7ee0a0"};
 const THEMES=[["🌙","linear-gradient(135deg,#3b1d6e,#140a24)"],["🔮","linear-gradient(135deg,#6d28d9,#c026d3)"],["🏰","linear-gradient(135deg,#1e3a8a,#3b1d6e)"],["⚔️","linear-gradient(135deg,#7f1d3a,#2a0a1a)"],["✦","linear-gradient(135deg,#a16207,#3b1d6e)"],["🦋","linear-gradient(135deg,#db2777,#6d28d9)"]];
 let NEWS=[
+ {"id": "maj-2026-11-14", "cat": "Mise à jour", "date": "2026-11-14", "ic": "📜", "g": "linear-gradient(135deg,#6d28d9,#c026d3)", "t": "Mise à jour du 14/11/2026", "s": "Taxe de 40 ☾ sur les terrains, chantiers des builders à 100 ☾, et l'app passe en libre service.", "b": "**1. Taxes**\nJusqu'ici, un terrain à bâtir n'avait pas de taxe mensuelle, contrairement aux maisons primes. Les terrains (et les maisons starters) ont désormais une taxe de **40 ☾** par mois.\n\n**2. Builders**\nLe salaire par chantier passe de **10 ☾ à 100 ☾**. Les builders n'étaient pas correctement rémunérés, et pour les acheteurs, faire bâtir une maison était presque gratuit.\n\n**3. L'app**\nL'application passe en libre service ! Nous avons besoin de quelques personnes pour essayer la messagerie, encore en version bêta. Elle arrivera bientôt sur le Play Store :)\nPour l'instant, le site n'est accessible qu'en partageant son lien."},
  {id:"refonte",cat:"Mise à jour",date:"2026-11-02",ic:"⚒️",g:"linear-gradient(135deg,#6d28d9,#c026d3)",t:"La grande refonte RPG est arrivée",s:"9 métiers repensés, le SolarCoin, des quêtes de métier et du butin exclusif.",b:"Solaris se relève, et avec elle, ses artisans. La refonte RPG change en profondeur la vie de chaque aventurier.\n\n**Ce qui change :**\n- 9 métiers fusionnés : Builder, Bataillon d'exploration, Cuisinier, Fermier, Enchanteur, Forgeron, Ingénieur, Maréchal-ferrant, Bûcheron\n- Le **SolarCoin ✦** rejoint le MoonCoin : 100 ✦ = 1 ☾\n- Des quêtes quotidiennes propres à ton métier dans le Dynasty Pass\n- Du butin de métier caché dans les coffres\n\nChoisis bien ta voie : elle te suivra dans chaque recoin de la Forêt des Arbres Géants."},
  {id:"vestiges",cat:"Mise à jour",date:"2026-10-30",ic:"🏚️",g:"linear-gradient(135deg,#3b1d6e,#140a24)",t:"Vestiges de Solaris : 524 blocs de ruines",s:"Portes brisées, poutres tombées, lustres effondrés… Rebâtis ou souviens-toi.",b:"Le nouveau mod **Vestiges de Solaris** ajoute 524 blocs de décoration ravagés, pour raconter la chute de la ville jusque dans tes constructions.\n\n- Portes brisées, chaises cassées, volets déchirés dans toutes les essences de bois\n- Gravats et murs effondrés pour 30 pierres\n- Lanternes tombées, livres éparpillés, tas d'os, rideaux déchirés\n\nLes ruines ne sont pas qu'un décor. Elles sont la mémoire de ce qu'on nous a pris."},
  {id:"coven",cat:"Lore",date:"2026-10-12",ic:"🌙",g:"linear-gradient(135deg,#db2777,#6d28d9)",t:"MoonSisters Coven est fondée",s:"Deux survivantes, un serment, et la première ville qui renaît dans la forêt.",b:"Ce soir-là, sous la lune, deux sœurs de sang mêlé ont planté la première pierre.\n\nMoonSisters Coven est désormais une ville officielle. Elle est le cœur de la résistance, le refuge de ceux que Solaris a rejetés : bâtards de Sorcières, exilés, survivants.\n\nTape **/city info MoonSisters Coven** pour découvrir ses habitants."},
@@ -743,7 +794,7 @@ function renderNews(){const A=allNews();
 function md(t){const out=[];let ul=[];const fl=()=>{if(ul.length){out.push("<ul>"+ul.map(x=>`<li>${x}</li>`).join("")+"</ul>");ul=[]}};
  esc(t).split(/\n/).forEach(l=>{l=l.replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");if(/^\s*-\s+/.test(l))ul.push(l.replace(/^\s*-\s+/,""));else{fl();if(l.trim())out.push(`<p>${l}</p>`)}});fl();return out.join("")}
 function renderArticle(n,preview){const c=CATS[n.cat]||"var(--violet)";
- $("#rbody").innerHTML=`<div><div class="ahead" style="background:${n.g}"><span class="big" style="animation:float 6s ease-in-out infinite">${n.ic}</span></div><span class="era" style="color:${c}">${n.cat} · ${fdate(n.date)}</span><h2>${esc(n.t)}</h2>${md(n.b)}<div class="orn">✦ ☾ ✦</div><div class="rnav">${preview?`<button class="btn ghost" onclick="closeReader();openEditor(true)">← Modifier</button><button class="btn" onclick="closeReader();publish()">Publier</button>`:`<button class="btn ghost" onclick="share('${n.id}')">Partager</button><button class="btn" onclick="closeReader()">Retour</button>`}</div></div>`;
+ $("#rbody").innerHTML=`<div class="art"><div class="ahead" style="background:${n.g}"><span class="big" style="animation:float 6s ease-in-out infinite">${n.ic}</span></div><span class="era" style="color:${c}">${n.cat} · ${fdate(n.date)}</span><h2>${esc(n.t)}</h2>${md(n.b)}<div class="orn">✦ ☾ ✦</div><div class="rnav">${preview?`<button class="btn ghost" onclick="closeReader();openEditor(true)">← Modifier</button><button class="btn" onclick="closeReader();publish()">Publier</button>`:`<button class="btn ghost" onclick="share('${n.id}')">Partager</button><button class="btn" onclick="closeReader()">Retour</button>`}</div></div>`;
  $("#rbody").style.setProperty("--c",c);$("#rbody").scrollTop=0;$("#rnum").textContent=preview?"APERÇU":"";$("#rprog").style.width="0";$("#reader").classList.add("on")}
 function openArticle(id){buzz();renderArticle(allNews().find(n=>n.id===id))}
 function share(id){const n=allNews().find(x=>x.id===id);const txt=`${n.t} — ${n.s}`;(navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>toast("✓ Copié, colle-le sur Discord"),()=>toast("Copie impossible ici"))}
