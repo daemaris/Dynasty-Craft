@@ -1,0 +1,62 @@
+[
+  {
+    "id": "maj-2026-11-14",
+    "cat": "Mise à jour",
+    "date": "2026-11-14",
+    "ic": "📜",
+    "g": "linear-gradient(135deg,#6d28d9,#c026d3)",
+    "t": "Mise à jour du 14/11/2026",
+    "s": "Taxe de 40 ☾ sur les terrains, chantiers des builders à 100 ☾, et l'app passe en libre service.",
+    "b": "**1. Taxes**\nJusqu'ici, un terrain à bâtir n'avait pas de taxe mensuelle, contrairement aux maisons primes. Les terrains (et les maisons starters) ont désormais une taxe de **40 ☾** par mois.\n\n**2. Builders**\nLe salaire par chantier passe de **10 ☾ à 100 ☾**. Les builders n'étaient pas correctement rémunérés, et pour les acheteurs, faire bâtir une maison était presque gratuit.\n\n**3. L'app**\nL'application passe en libre service ! Nous avons besoin de quelques personnes pour essayer la messagerie, encore en version bêta. Elle arrivera bientôt sur le Play Store :)\nPour l'instant, le site n'est accessible qu'en partageant son lien."
+  },
+  {
+    "id": "refonte",
+    "cat": "Mise à jour",
+    "date": "2026-11-02",
+    "ic": "⚒️",
+    "g": "linear-gradient(135deg,#6d28d9,#c026d3)",
+    "t": "La grande refonte RPG est arrivée",
+    "s": "9 métiers repensés, le SolarCoin, des quêtes de métier et du butin exclusif.",
+    "b": "Solaris se relève, et avec elle, ses artisans. La refonte RPG change en profondeur la vie de chaque aventurier.\n\n**Ce qui change :**\n- 9 métiers fusionnés : Builder, Bataillon d'exploration, Cuisinier, Fermier, Enchanteur, Forgeron, Ingénieur, Maréchal-ferrant, Bûcheron\n- Le **SolarCoin ✦** rejoint le MoonCoin : 100 ✦ = 1 ☾\n- Des quêtes quotidiennes propres à ton métier dans le Dynasty Pass\n- Du butin de métier caché dans les coffres\n\nChoisis bien ta voie : elle te suivra dans chaque recoin de la Forêt des Arbres Géants."
+  },
+  {
+    "id": "vestiges",
+    "cat": "Mise à jour",
+    "date": "2026-10-30",
+    "ic": "🏚️",
+    "g": "linear-gradient(135deg,#3b1d6e,#140a24)",
+    "t": "Vestiges de Solaris : 524 blocs de ruines",
+    "s": "Portes brisées, poutres tombées, lustres effondrés… Rebâtis ou souviens-toi.",
+    "b": "Le nouveau mod **Vestiges de Solaris** ajoute 524 blocs de décoration ravagés, pour raconter la chute de la ville jusque dans tes constructions.\n\n- Portes brisées, chaises cassées, volets déchirés dans toutes les essences de bois\n- Gravats et murs effondrés pour 30 pierres\n- Lanternes tombées, livres éparpillés, tas d'os, rideaux déchirés\n\nLes ruines ne sont pas qu'un décor. Elles sont la mémoire de ce qu'on nous a pris."
+  },
+  {
+    "id": "coven",
+    "cat": "Lore",
+    "date": "2026-10-12",
+    "ic": "🌙",
+    "g": "linear-gradient(135deg,#db2777,#6d28d9)",
+    "t": "MoonSisters Coven est fondée",
+    "s": "Deux survivantes, un serment, et la première ville qui renaît dans la forêt.",
+    "b": "Ce soir-là, sous la lune, deux sœurs de sang mêlé ont planté la première pierre.\n\nMoonSisters Coven est désormais une ville officielle. Elle est le cœur de la résistance, le refuge de ceux que Solaris a rejetés : bâtards de Sorcières, exilés, survivants.\n\nTape **/city info MoonSisters Coven** pour découvrir ses habitants."
+  },
+  {
+    "id": "roue",
+    "cat": "Événement",
+    "date": "2026-11-05",
+    "ic": "🎡",
+    "g": "linear-gradient(135deg,#a16207,#3b1d6e)",
+    "t": "Vote, gagne des Jetons, fais tourner la Roue",
+    "s": "Chaque vote rapporte 2 Jetons de Solaris. Des blocs ultra rares t'attendent.",
+    "b": "La Roue du Coven tourne pour ceux qui soutiennent le serveur.\n\n- **2 Jetons de Solaris** par vote\n- **10 Jetons + 3 ☾** pour le joueur du mois\n- Des blocs ultra rares parmi les gains\n\nPlus on vote, plus le Coven grandit. Merci à vous !"
+  },
+  {
+    "id": "eco",
+    "cat": "Économie",
+    "date": "2026-11-04",
+    "ic": "☾",
+    "g": "linear-gradient(135deg,#1e3a8a,#3b1d6e)",
+    "t": "Une économie plus saine",
+    "s": "Salaire selon ta présence, frais de change, marchand plus juste.",
+    "b": "Pour que le MoonCoin garde sa valeur, l'économie a été rééquilibrée.\n\n- Le salaire fixe dépend de ta présence : 10 jours en jeu dans le mois pour le toucher en entier\n- Le change MoonCoin ↔ SolarCoin coûte **3 %**\n- Le marchand rachète moins quand on lui vend toujours le même objet le même jour\n\nLes fermes géantes ne font plus la loi : ce sont les artisans qui font vivre Solaris."
+  }
+]
