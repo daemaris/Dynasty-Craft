@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://dynasty-craft.pages.dev/sitemap.xml
