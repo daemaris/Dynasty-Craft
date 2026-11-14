@@ -381,7 +381,7 @@ h2{font-size:19px;font-weight:700;margin:26px 0 12px}
   #s-guide .search{max-width:520px}
   .job{min-width:230px}
   /* messages : deux volets */
-  
+  #s-msg{right:auto;width:420px;padding:44px 24px;border-right:1px solid var(--line)}
   .chat{left:680px;transform:none;opacity:0;pointer-events:none;transition:opacity .3s;background:linear-gradient(#150a24,#0a0512)}
   .chat.on{opacity:1;pointer-events:auto}
   .chat .chead>.icobtn:first-child{display:none}
@@ -497,10 +497,8 @@ h2{font-size:19px;font-weight:700;margin:26px 0 12px}
 
     <!-- MESSAGES -->
     <section class="screen" id="s-msg">
-      <div class="top"><div><div class="eyebrow">Corbeaux du Coven</div><h1>Messages</h1></div></div>
-      <div class="card ingame"><span style="font-size:22px">🕯️</span><div><b>Lié au jeu.</b> Un joueur hors ligne reçoit ton message à sa prochaine connexion, directement dans le tchat Minecraft.</div></div>
-      <div class="card shophero" style="margin-top:4px"><div class="soon">BIENTÔT</div><div style="font-size:54px;margin:6px 0 10px">🪶</div><h3 style="font-size:20px">Les Corbeaux arrivent</h3><p class="sub" style="margin:8px 0 0">Bientôt, connecte-toi avec Discord pour écrire aux autres joueurs, discuter avec ta ville et recevoir tes messages directement en jeu.</p></div>
-      <a class="card discord" href="https://discord.gg/wRcWaHzMAh" target="_blank" rel="noopener" style="margin-top:14px"><span class="dico">💬</span><span style="flex:1"><b>En attendant, rejoins le Discord</b><small>Toute la communauté y est déjà</small></span><span class="chev">›</span></a>
+      <div class="top"><div><div class="eyebrow">Corbeaux du Coven · bêta</div><h1>Messages</h1></div><div style="display:flex;gap:8px"><button class="icobtn" id="dmMod" hidden onclick="DM.ouvrirModeration()" title="Modération">🛡</button><button class="icobtn" id="dmNew" hidden onclick="DM.nouveau()" title="Nouveau message">✎</button></div></div>
+      <div id="dmZone"><div class="empty">Chargement…</div></div>
       <div class="convs" id="convs" hidden></div>
     </section>
 
@@ -524,11 +522,12 @@ h2{font-size:19px;font-weight:700;margin:26px 0 12px}
 
   <!-- chat -->
   <div class="chat" id="chat">
-    <div class="chead"><button class="icobtn" onclick="closeChat()">←</button><div class="cv" style="padding:0;margin:0"><div class="av" id="cav"></div></div><div style="flex:1"><b id="cname"></b><small id="cstat"></small></div><button class="icobtn" onclick="toast('📍 Position partagée — bientôt')">📍</button></div>
-    <div class="msgs" id="msgs"><div class="typing" id="typing"><i></i><i></i><i></i></div></div>
-    <div class="quick" id="quick"></div>
-    <form class="compose" onsubmit="send(event)"><input id="mi" placeholder="Envoyer un corbeau…" autocomplete="off"><button class="send" type="submit">➤</button></form>
+    <div class="chead"><button class="icobtn" onclick="DM.fermer()">←</button><div class="cv" style="padding:0;margin:0"><div class="av" id="cav"></div></div><div style="flex:1;min-width:0"><b id="cname"></b><small id="cstat"></small></div><button class="icobtn" onclick="DM.menuConv()">⋯</button></div>
+    <div class="msgs" id="msgs"></div>
+    <form class="compose" onsubmit="DM.envoyer(event)"><input id="mi" placeholder="Envoyer un corbeau…" autocomplete="off" maxlength="500"><button class="send" type="submit">➤</button></form>
   </div>
+
+  <div class="sheet" id="dmSheet" onclick="if(event.target===this)DM.fermerSheet()"><div class="sheetin"><div class="grab"></div><div id="dmSheetIn"></div></div></div>
 
   <div class="sheet" id="sheet">
     <div class="sheetin">
@@ -686,7 +685,7 @@ let NEWS=[
  {id:"refonte",cat:"Mise à jour",date:"2026-11-02",ic:"⚒️",g:"linear-gradient(135deg,#6d28d9,#c026d3)",t:"La grande refonte RPG est arrivée",s:"9 métiers repensés, le SolarCoin, des quêtes de métier et du butin exclusif.",b:"Solaris se relève, et avec elle, ses artisans. La refonte RPG change en profondeur la vie de chaque aventurier.\n\n**Ce qui change :**\n- 9 métiers fusionnés : Builder, Bataillon d'exploration, Cuisinier, Fermier, Enchanteur, Forgeron, Ingénieur, Maréchal-ferrant, Bûcheron\n- Le **SolarCoin ✦** rejoint le MoonCoin : 100 ✦ = 1 ☾\n- Des quêtes quotidiennes propres à ton métier dans le Dynasty Pass\n- Du butin de métier caché dans les coffres\n\nChoisis bien ta voie : elle te suivra dans chaque recoin de la Forêt des Arbres Géants."},
  {id:"vestiges",cat:"Mise à jour",date:"2026-10-30",ic:"🏚️",g:"linear-gradient(135deg,#3b1d6e,#140a24)",t:"Vestiges de Solaris : 524 blocs de ruines",s:"Portes brisées, poutres tombées, lustres effondrés… Rebâtis ou souviens-toi.",b:"Le nouveau mod **Vestiges de Solaris** ajoute 524 blocs de décoration ravagés, pour raconter la chute de la ville jusque dans tes constructions.\n\n- Portes brisées, chaises cassées, volets déchirés dans toutes les essences de bois\n- Gravats et murs effondrés pour 30 pierres\n- Lanternes tombées, livres éparpillés, tas d'os, rideaux déchirés\n\nLes ruines ne sont pas qu'un décor. Elles sont la mémoire de ce qu'on nous a pris."},
  {id:"coven",cat:"Lore",date:"2026-10-12",ic:"🌙",g:"linear-gradient(135deg,#db2777,#6d28d9)",t:"MoonSisters Coven est fondée",s:"Deux survivantes, un serment, et la première ville qui renaît dans la forêt.",b:"Ce soir-là, sous la lune, deux sœurs de sang mêlé ont planté la première pierre.\n\nMoonSisters Coven est désormais une ville officielle. Elle est le cœur de la résistance, le refuge de ceux que Solaris a rejetés : bâtards de Sorcières, exilés, survivants.\n\nTape **/city info MoonSisters Coven** pour découvrir ses habitants."},
- {id:"roue",cat:"Événement",date:"2026-11-05",ic:"🎡",g:"linear-gradient(135deg,#a16207,#3b1d6e)",t:"Vote, gagne des Jetons, fais tourner la Roue",s:"Chaque vote rapporte 2 Jetons de Solaris. Des blocs ultra rares t'attendent.",b:"La Roue du Coven tourne pour ceux qui soutiennent le serveur.\n\n- **2 Jetons de Solaris** par vote\n- **10 Jetons + 3 ☾** pour le joueur du mois\n- Des blocs ultra rares parmi les gains\n\nPlus on vote, plus le Coven grandit. Merci à vous !"},
+ {id:"roue",cat:"Mise à jour",date:"2026-11-05",ic:"🎡",g:"linear-gradient(135deg,#a16207,#3b1d6e)",t:"La Roue du Coven : vote et gagne des Jetons",s:"Chaque vote rapporte 2 Jetons de Solaris. Des blocs ultra rares t'attendent.",b:"La Roue du Coven tourne pour ceux qui soutiennent le serveur.\n\n- **2 Jetons de Solaris** par vote\n- **10 Jetons + 3 ☾** pour le joueur du mois\n- Des blocs ultra rares parmi les gains\n\nPlus on vote, plus le Coven grandit. Merci à vous !"},
  {id:"eco",cat:"Économie",date:"2026-11-04",ic:"☾",g:"linear-gradient(135deg,#1e3a8a,#3b1d6e)",t:"Une économie plus saine",s:"Salaire selon ta présence, frais de change, marchand plus juste.",b:"Pour que le MoonCoin garde sa valeur, l'économie a été rééquilibrée.\n\n- Le salaire fixe dépend de ta présence : 10 jours en jeu dans le mois pour le toucher en entier\n- Le change MoonCoin ↔ SolarCoin coûte **3 %**\n- Le marchand rachète moins quand on lui vend toujours le même objet le même jour\n\nLes fermes géantes ne font plus la loi : ce sont les artisans qui font vivre Solaris."}
 ];
 /* ---------- helpers ---------- */
@@ -841,5 +840,7 @@ applyProfile();renderTimeline();renderNews();renderSteps();renderConvs();renderI
 const h=location.hash.slice(1);if(ORDER.includes(h))go(h);
 setTimeout(()=>$("#splash").classList.add("off"),1500);
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="messagerie.js"></script>
 </body>
 </html>

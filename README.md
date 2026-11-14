@@ -9,6 +9,7 @@ Site et application installable (PWA) du serveur Minecraft RPG Dynasty Craft.
 | `actualites.json` | Les articles de l'accueil | Oui, souvent |
 | `chroniques.json` | Les chapitres du lore (onglet Chroniques) | Oui |
 | `index.html` | L'application elle-même | Avec Claude |
+| `messagerie.js` | La messagerie (Supabase, clé publique) | Avec Claude |
 | `logo.jpg` | Le logo de l'accueil | Oui (même nom) |
 | `icons/` | L'icône de l'app (le D gothique) | Oui (mêmes noms) |
 | `manifest.webmanifest` | Nom et couleurs de l'app installée | Rarement |
