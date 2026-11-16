@@ -44,7 +44,7 @@
     chargementEnCours = Promise.all([
       sb.from("quetes_chapitres").select("*").order("ordre"),
       sb.from("quetes").select("*").order("ordre"),
-      moi ? sb.from("quetes_etats").select("cle,fini,reclame,fin_le") : Promise.resolve({ data: [] }),
+      moi ? sb.from("quetes_etats").select("*") : Promise.resolve({ data: [] }),
       sb.from("villes_carte").select("*"),
       sb.from("villes_plans").select("*")
     ]).then(function (r) {
@@ -76,7 +76,69 @@
   });
 
   // ═══ QUÊTES ═════════════════════════════════════════════════════════════
-  function fini(cle) { return !!donnees.etats[cle]; }
+  function fini(cle) { var e = donnees.etats[cle]; return !!(e && e.fini !== false); }
+
+  // noms français des récompenses les plus courantes (sinon : nom tiré de l'identifiant)
+  var NOMS_OBJETS = {
+    "minecraft:bread": "Pain", "minecraft:torch": "Torches", "minecraft:carrot": "Carottes", "minecraft:stone_sword": "Épée en pierre",
+    "minecraft:apple": "Pommes", "minecraft:anvil": "Enclume", "minecraft:cauldron": "Chaudron", "minecraft:chest": "Coffre",
+    "minecraft:coal": "Charbon", "minecraft:crafting_table": "Établi", "minecraft:fishing_rod": "Canne à pêche", "minecraft:furnace": "Four",
+    "minecraft:oak_log": "Bûches de chêne", "minecraft:red_bed": "Lit rouge", "minecraft:stone": "Pierre", "minecraft:wooden_axe": "Hache en bois",
+    "farmersdelight:stove": "Cuisinière", "dynasty_quetes:fragment_memoire": "Fragment de Mémoire", "minecraft:iron_ingot": "Lingots de fer",
+    "minecraft:emerald": "Émeraudes", "minecraft:diamond": "Diamants", "minecraft:gold_ingot": "Lingots d'or", "minecraft:cooked_beef": "Steaks"
+  };
+  function nomObjet(r) {
+    if (r.nom) return r.nom;
+    var id = String(r.objet || "").replace(/\[.*$/, "");
+    if (NOMS_OBJETS[id]) return NOMS_OBJETS[id];
+    var n = id.split(":").pop().replace(/_/g, " ");
+    return n.charAt(0).toUpperCase() + n.slice(1);
+  }
+  function texteRecompense(r) {
+    if (r.type === "objet") return (r.nombre > 1 ? r.nombre + " × " : "") + nomObjet(r);
+    if (r.type === "xp") return r.points + " points d'expérience";
+    if (r.type === "mooncoins") return r.montant + " MoonCoins";
+    if (r.type === "choix") return r.texte + (r.options && r.options.length ? " : " + r.options.join(", ") : "");
+    return r.texte || "";
+  }
+
+  /** Détail d'une quête dépliée : récit, réplique, objectifs (cochés selon l'avancement), récompenses. */
+  function detailQuete(x, st, moi) {
+    var e = donnees.etats[x.cle], html = "";
+    if (x.description) html += '<span class="grrecit">' + h(x.description).replace(/\n/g, "<br>") + "</span>";
+    if (x.dialogue) html += '<span class="grdial">« ' + h(x.dialogue).replace(/\n/g, "<br>") + " »" + (x.pnj ? "<i>— " + h(x.pnj) + "</i>" : "") + "</span>";
+    var obs = x.objectifs || [];
+    if (obs.length) {
+      html += '<span class="grsec">Objectifs</span><span class="grobjs">';
+      obs.forEach(function (o, i) {
+        var total = o.total || 1, fait = 0;
+        if (moi && e) fait = e.fini !== false ? total : Math.min(total, (e.obj || [])[i] || 0);
+        var ok = moi && fait >= total;
+        html += '<span class="grobj' + (ok ? " ok" : "") + (moi ? "" : " neutre") + '"><b>' + (ok ? "✓" : moi ? "" : "•") + "</b><span>" + h(o.texte) +
+          (o.optionnel ? " <small>(facultatif)</small>" : "") +
+          (total > 1 && moi && !ok ? " <small>" + fait + "/" + total + "</small>" : total > 1 && !moi ? " <small>×" + total + "</small>" : "") + "</span></span>";
+      });
+      html += "</span>";
+    }
+    var rs = (x.recompenses || []).map(texteRecompense).filter(Boolean);
+    if (rs.length) {
+      html += '<span class="grsec">Récompenses</span><span class="grrecs">';
+      rs.forEach(function (t) { html += "<span>" + h(t) + "</span>"; });
+      html += "</span>";
+    }
+    if (!html) html = '<span class="grrecit">Pas de détail pour cette quête.</span>';
+    if (e && e.fin_le && e.fini !== false) html += "<i>Terminée le " + dateFr(e.fin_le) + "</i>";
+    return html;
+  }
+
+  /** Objectifs remplis d'une quête en cours, ex. « 2/5 ». */
+  function avancement(x) {
+    var e = donnees.etats[x.cle], obs = x.objectifs || [];
+    if (!e || e.fini !== false || !obs.length) return "";
+    var n = 0;
+    obs.forEach(function (o, i) { if (((e.obj || [])[i] || 0) >= (o.total || 1)) n++; });
+    return n + "/" + obs.length;
+  }
 
   function chapitreFini(id) {
     var qs = donnees.quetes.filter(function (x) { return x.chapitre === id; });
@@ -86,7 +148,7 @@
   /** État d'une quête : faite, à réclamer, en cours, verrouillée. */
   function statut(quete, chapitreOuvert) {
     var e = donnees.etats[quete.cle];
-    if (e) return e.reclame ? "faite" : "reclamer";
+    if (e && e.fini !== false) return e.reclame ? "faite" : "reclamer";
     if (!chapitreOuvert) return "verrou";
     var req = quete.requiert || [];
     var ok = req.every(function (id) { return fini(id.indexOf("/") > 0 ? id : quete.chapitre + "/" + id); });
@@ -139,14 +201,14 @@
         var st = moi ? statut(x, ouvert) : "neutre";
         var ico = { faite: "✓", reclamer: "✦", encours: "☾", verrou: "🔒", neutre: String(i + 1) }[st];
         var etiquette = { faite: "Terminée", reclamer: "À réclamer dans le grimoire", encours: "En cours", verrou: "Verrouillée", neutre: "" }[st];
+        if (st === "encours" && avancement(x)) etiquette += " · " + avancement(x) + " objectifs";
         var meta = [x.lieu, x.pnj].filter(Boolean).join(" · ");
         var deplie = ouverte === x.cle;
         var cache = st === "verrou";
         html += '<button class="grq ' + st + (deplie ? " open" : "") + '" onclick="GRIM.ouvrir(\'' + h(x.cle) + '\')">' +
           '<span class="grico">' + ico + '</span><span class="grtxt"><b>' + h(x.titre) + '</b>' +
           (meta ? "<small>" + h(meta) + "</small>" : "") + (etiquette ? '<em>' + etiquette + "</em>" : "") +
-          (deplie ? '<span class="grdet">' + (cache ? "Le grimoire garde encore ses secrets… termine les quêtes précédentes." : h(x.description || "Pas de description.").replace(/\n/g, "<br>")) +
-            (donnees.etats[x.cle] && donnees.etats[x.cle].fin_le ? '<i>Terminée le ' + dateFr(donnees.etats[x.cle].fin_le) + "</i>" : "") + "</span>" : "") +
+          (deplie ? '<span class="grdet">' + (cache ? "Le grimoire garde encore ses secrets… termine les quêtes précédentes." : detailQuete(x, st, moi)) + "</span>" : "") +
           '</span><span class="chev">›</span></button>';
       });
       html += "</div></div>";
@@ -684,6 +746,19 @@
     ".grq.encours .grtxt em{color:var(--ice)}",
     ".grdet{display:block;margin-top:8px;font-size:13px;line-height:1.5;color:#ddd0f2}",
     ".grdet i{display:block;margin-top:6px;color:var(--live);font-style:normal;font-size:12px}",
+    ".grrecit{display:block}",
+    ".grdial{display:block;margin-top:8px;padding:8px 10px;border-left:2px solid var(--gold);background:rgba(240,192,96,.06);border-radius:0 10px 10px 0;font-style:italic;color:#f3e3c0}",
+    ".grdial i{display:block;margin-top:3px;font-size:11.5px;color:var(--gold)!important}",
+    ".grsec{display:block;margin:10px 0 5px;font-family:'Pixelify Sans';font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ice)}",
+    ".grobjs{display:flex;flex-direction:column;gap:5px}",
+    ".grobj{display:flex;gap:8px;align-items:flex-start}",
+    ".grobj b{flex:none;width:17px;height:17px;border-radius:5px;border:1.5px solid var(--line);display:grid;place-items:center;font-size:11px;margin-top:1px}",
+    ".grobj.neutre b{border:0;color:var(--dim)}",
+    ".grobj.ok b{background:rgba(126,224,160,.2);border-color:var(--live);color:var(--live)}",
+    ".grobj.ok>span{color:var(--mute);text-decoration:line-through;text-decoration-color:rgba(255,255,255,.25)}",
+    ".grobj small{color:var(--dim);font-size:11.5px}",
+    ".grrecs{display:flex;flex-wrap:wrap;gap:6px}",
+    ".grrecs span{padding:4px 9px;border-radius:9px;background:rgba(240,192,96,.12);border:1px solid rgba(240,192,96,.3);color:#f3e3c0;font-size:12.5px}",
     ".grinfo{text-align:center;padding:26px 18px}",
     ".grcarte{padding:8px}",
     ".grmap{position:relative;border-radius:14px;overflow:hidden;aspect-ratio:5/4;background:#d9c08f;touch-action:none}",

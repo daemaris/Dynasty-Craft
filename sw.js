@@ -1,6 +1,6 @@
 // Dynasty Craft — fonctionnement hors connexion
 // Change ce numéro si un changement n'apparaît pas chez les joueurs.
-const VERSION = "dynasty-v5";
+const VERSION = "dynasty-v6";
 const FICHIERS = ["./", "index.html", "logo.jpg", "actualites.json", "chroniques.json",
   "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png"];
 
