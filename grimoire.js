@@ -420,11 +420,20 @@
     return url + (url.indexOf("?") < 0 ? "?" : "&") + "v=" + encodeURIComponent(pl.image_maj);
   }
 
+  /** Vue de départ : centrée sur le centre de la ville (/city), assez zoomée pour voir les maisons. */
+  function vueDepart(pl) {
+    var v = (donnees.villes || []).filter(function (x) { return x.cle === pl.cle && x.a_centre && x.x != null; })[0];
+    var r = pl.largeur / pl.hauteur;
+    var w = Math.min(pl.largeur, 320), hh = w / r;
+    var cx = v ? v.x : pl.x0 + pl.largeur / 2, cz = v ? v.z : pl.z0 + pl.hauteur / 2;
+    return { x: cx - w / 2, y: cz - hh / 2, w: w, h: hh };
+  }
+
   function ouvrirPlan(cle) {
     var pl = planDe(cle);
     if (!pl) return;
     plan.cle = cle; plan.elements = null; plan.erreur = false; plan.choisi = null; plan.recherche = "";
-    plan.vue = { x: pl.x0, y: pl.z0, w: pl.largeur, h: pl.hauteur };
+    plan.vue = vueDepart(pl);
     if (!plan.fond) plan.fond = "jeu";
     afficherPlan();
     var sb = client();
@@ -711,7 +720,7 @@
       plan.vue = { x: cx - w / 2, y: cy - hh / 2, w: w, h: hh };
       afficherPlanSvg();
     },
-    recentrerPlan: function () { var pl = planDe(plan.cle); if (pl) { plan.vue = { x: pl.x0, y: pl.z0, w: pl.largeur, h: pl.hauteur }; afficherPlanSvg(); } },
+    recentrerPlan: function () { var pl = planDe(plan.cle); if (pl) { plan.vue = vueDepart(pl); afficherPlanSvg(); } },
     copier: function (x, z) {
       var t = x + " ~ " + z;
       (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { notif("✓ Coordonnées copiées : " + t); }, function () { notif("X " + x + " · Z " + z); });
