@@ -83,10 +83,22 @@
 
   function zone(html) { var z = q("#dmZone"); if (z) z.innerHTML = html; }
 
+  /** Prévient le reste de l'app (quêtes du grimoire…) que le compte a changé. */
+  function signalerCompte() {
+    try { document.dispatchEvent(new CustomEvent("dynasty:compte", { detail: { user: etat.user, moi: etat.moi, pseudo: etat.moiPseudo } })); } catch (e) {}
+  }
+  window.DynastyCompte = {
+    client: function () { return sb; },
+    user: function () { return etat.user; },
+    moi: function () { return etat.moi; },
+    pseudo: function () { return etat.moiPseudo; }
+  };
+
   function charger() {
     if (!etat.user) {
-      etat.profil = null; etat.moi = null; arreterTempsReel(); badge(0);
+      etat.profil = null; etat.moi = null; etat.moiPseudo = null; arreterTempsReel(); badge(0);
       q("#dmNew").hidden = true; q("#dmMod").hidden = true;
+      signalerCompte();
       return ecranConnexion();
     }
     zone('<div class="empty">Chargement…</div>');
@@ -102,7 +114,7 @@
         q("#dmNew").hidden = true;
         return zone(carteCompte() + '<div class="card dmcard"><b>Accès suspendu</b><p class="sub">Ton accès à la messagerie a été suspendu par le staff. Contacte-nous sur le Discord si tu penses que c\'est une erreur.</p></div>');
       }
-      if (!etat.moi) { q("#dmNew").hidden = true; return ecranLiaison(); }
+      if (!etat.moi) { q("#dmNew").hidden = true; signalerCompte(); return ecranLiaison(); }
       return sb.from("joueurs").select("pseudo").eq("mc_uuid", etat.moi).maybeSingle().then(function (j) {
         etat.moiPseudo = j.data ? j.data.pseudo : null;
         if (etat.moiPseudo) {
@@ -113,6 +125,7 @@
           try { if (!prof.pr) { prof.pr = { elle: "f", il: "m", neutre: "n" }[etat.profil.pronoms]; store.set("profil", prof); applyProfile(); } } catch (e) {}
         }
         q("#dmNew").hidden = false;
+        signalerCompte();
         demarrerTempsReel();
         rafraichirListe();
       });

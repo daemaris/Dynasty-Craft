@@ -236,7 +236,14 @@ h2{font-size:19px;font-weight:700;margin:26px 0 12px}
 .coin .c{width:34px;height:34px;margin:0 auto 6px;border-radius:50%;display:grid;place-items:center;font-size:18px}
 .conv{display:flex;align-items:center;gap:8px;margin-top:8px;padding:10px;border-radius:12px;background:rgba(0,0,0,.25)}
 .conv input{width:70px;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:8px;padding:6px 8px;outline:0}
-.jobs{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;margin:0 -16px;padding-left:16px;padding-right:16px;scroll-snap-type:x mandatory;scrollbar-width:none}
+.jobswrap{position:relative}
+.jobs{display:flex;gap:10px;overflow-x:auto;padding:2px 0 6px;margin:0;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none}
+.jobnav{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:19px;line-height:1;color:var(--ink);background:rgba(255,255,255,.06);border:1px solid var(--line);transition:opacity .2s,background .2s}
+.jobnav:hover{background:rgba(192,132,252,.18)}
+.jobnav[disabled]{opacity:.3;pointer-events:none}
+.jobhead{display:flex;align-items:center;gap:8px;margin:0 0 10px;color:var(--mute);font-size:13px}
+.jobhead span:first-child{flex:1}
+.jobhead #jobcpt{min-width:38px;text-align:center;font-variant-numeric:tabular-nums}
 .jobs::-webkit-scrollbar{display:none}
 .job{min-width:200px;scroll-snap-align:start;padding:14px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
 .job .ic{font-size:24px}
@@ -333,7 +340,7 @@ h2{font-size:19px;font-weight:700;margin:26px 0 12px}
   .ncard{min-width:46%}
   .items{grid-template-columns:repeat(3,1fr)}
   .races{grid-template-columns:repeat(3,1fr)}
-  .grid2{grid-template-columns:repeat(4,1fr)}
+  .grid2{grid-template-columns:repeat(3,1fr)}
   .rbody{padding-left:max(26px,calc((100% - 640px)/2));padding-right:max(26px,calc((100% - 640px)/2))}
   .sheetin{width:600px;margin:0 auto;border-radius:26px 26px 0 0}
 }
@@ -367,7 +374,7 @@ h2{font-size:19px;font-weight:700;margin:26px 0 12px}
   .ncard{min-width:0}
   .ncard:nth-child(n+4){display:none}
   #nlist{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
-  .grid2{grid-template-columns:repeat(4,1fr)}
+  .grid2{grid-template-columns:repeat(3,1fr)}
   .featured{display:grid;grid-template-columns:1fr auto;align-items:end;gap:6px 24px}
   .featured .btn{grid-row:1/4;grid-column:2;align-self:center}
   /* lore & guide */
@@ -463,6 +470,8 @@ h2{font-size:19px;font-weight:700;margin:26px 0 12px}
         <button class="card tile" onclick="go('guide');setTimeout(()=>openAcc('eco'),400)"><span class="ic">☾</span><b>MoonCoins</b><small>Banque & économie</small></button>
         <button class="card tile" onclick="go('lore');setTimeout(()=>setSeg('races'),300)"><span class="ic">🧝</span><b>Les 9 races</b><small>Choisis ton sang</small></button>
         <button class="card tile" onclick="go('guide');setTimeout(()=>openAcc('jobs'),400)"><span class="ic">⚒️</span><b>Métiers</b><small>9 voies, 1 destin</small></button>
+        <button class="card tile" onclick="go('guide');setTimeout(()=>setGSeg('quetes'),300)"><span class="ic">📖</span><b>Mes quêtes</b><small>Le grimoire du Coven</small></button>
+        <button class="card tile" onclick="go('guide');setTimeout(()=>setGSeg('carte'),300)"><span class="ic">🗺️</span><b>Carte des villes</b><small>Forêt des Arbres Géants</small></button>
       </div>
 
       <h2>Toutes les actualités</h2>
@@ -485,6 +494,14 @@ h2{font-size:19px;font-weight:700;margin:26px 0 12px}
     <!-- GUIDE -->
     <section class="screen" id="s-guide">
       <div class="top"><div><div class="eyebrow">Grimoire du joueur</div><h1>Guide</h1></div></div>
+      <div class="card seg" id="gseg">
+        <button class="on" data-k="guide" onclick="setGSeg('guide')">Guide</button>
+        <button data-k="quetes" onclick="setGSeg('quetes')">Quêtes</button>
+        <button data-k="carte" onclick="setGSeg('carte')">Carte</button>
+      </div>
+      <div id="gseg-quetes" hidden></div>
+      <div id="gseg-carte" hidden></div>
+      <div id="gseg-guide">
       <div class="card search"><span>🔍</span><input id="q" placeholder="Chercher : banque, ville, métier…" oninput="filterGuide()"></div>
       <div id="guideMain">
         <div class="card progress"><div class="ring" id="ring"><span id="ringTxt">0/7</span></div><div><b style="font-family:Cinzel">Premiers pas</b><div class="sub" style="font-size:13px">Coche chaque étape au fur et à mesure.</div></div></div>
@@ -493,6 +510,7 @@ h2{font-size:19px;font-weight:700;margin:26px 0 12px}
         <div id="accs"></div>
       </div>
       <div id="guideSearch" hidden><div class="card" style="padding:4px 14px" id="results"></div></div>
+      </div>
     </section>
 
     <!-- MESSAGES -->
@@ -654,7 +672,7 @@ const ACCS=[
  <p style="margin:6px 0">100 SolarCoins = 1 MoonCoin. Change avec <code>/banque moneytrade mc|sc &lt;montant&gt;</code> (3 % de frais).</p>
  <div class="conv">Convertir <input id="mcIn" type="number" value="2" min="0" oninput="calc()"> ☾ → <b id="scOut" style="color:var(--gold);font-family:'Pixelify Sans'">194 ✦</b></div>
  <ul><li>Salaire fixe : 150 ☾/mois avec métier, 50 ☾ sans (selon ta présence).</li><li>Le marchand rachète à 50 % ; au-delà de 2000 ✦ par jour et par objet, il rachète moins.</li></ul>`},
- {id:"jobs",ic:"⚒️",t:"Les 9 métiers",k:"metier métiers builder bucheron cuisinier fermier forgeron enchanteur ingenieur",html:`<p style="margin:0 0 10px">Glisse pour découvrir chaque voie →</p><div class="jobs">${JOBS.map(j=>`<div class="job"><div class="ic">${j[0]}</div><b>${j[1]}</b><small>${j[2]}</small><p>${j[3]}</p></div>`).join("")}</div>`},
+ {id:"jobs",ic:"⚒️",t:"Les 9 métiers",k:"metier métiers builder bucheron cuisinier fermier forgeron enchanteur ingenieur",html:`<div class="jobhead"><span>Découvre chaque voie</span><button class="jobnav g" aria-label="Métier précédent" onclick="jobsDefiler(-1)" disabled>‹</button><span id="jobcpt">1 / ${JOBS.length}</span><button class="jobnav d" aria-label="Métier suivant" onclick="jobsDefiler(1)">›</button></div><div class="jobswrap"><div class="jobs" id="jobs" onscroll="jobsMaj()">${JOBS.map(j=>`<div class="job"><div class="ic">${j[0]}</div><b>${j[1]}</b><small>${j[2]}</small><p>${j[3]}</p></div>`).join("")}</div></div>`},
  {id:"city",ic:"🏰",t:"Villes",k:"ville city join colon fondateur",html:`<ul><li><code>/city list</code> — toutes les villes</li><li><code>/city info [nom]</code> — chef, habitants, territoire</li><li><code>/city join &lt;nom&gt;</code> — rejoindre (Exilé → Colon)</li><li><code>/city leave</code> — partir</li></ul><p style="margin:0">Certaines villes sont fermées : on n'y entre que sur invitation du chef.</p>`},
  {id:"home",ic:"🏠",t:"Maisons & terrains",k:"maison terrain appartement achat prix",html:`<ul><li>Maison : 3 ☾ le bloc</li><li>Appartement : 2 ☾ le bloc</li><li>Terrain : 1 ☾ le bloc</li></ul><p style="margin:0">Les ateliers de métier ne sont jamais à vendre : le staff les attribue aux artisans.</p>`},
  {id:"pass",ic:"🎖️",t:"Dynasty Pass & quêtes",k:"pass quete quêtes quotidienne cosmetique",html:`<p style="margin:0">Des quêtes quotidiennes liées à ton métier, des paliers à débloquer et un cosmétique du mois pour les plus assidus.</p>`},
@@ -734,6 +752,8 @@ function renderSteps(){$("#steps").innerHTML=STEPS.map((s,i)=>`<div class="step 
  const p=Math.round(done.size/STEPS.length*100);$("#ring").style.background=`conic-gradient(var(--moss) ${p}%,rgba(255,255,255,.08) 0)`;$("#ringTxt").textContent=done.size+"/"+STEPS.length}
 function toggleStep(i){buzz();done.has(i)?done.delete(i):done.add(i);store.set("steps",[...done]);renderSteps();if(done.size===STEPS.length)toast("☾ Bienvenue au Coven, "+(prof.pseudo||P().nom)+" !")}
 $("#accs").innerHTML=ACCS.map(a=>`<div class="card acc" id="acc-${a.id}"><button onclick="openAcc('${a.id}',true)"><span class="ic">${a.ic}</span><b>${a.t}</b><span class="chev">›</span></button><div class="inner"><div><div class="content">${a.html}</div></div></div></div>`).join("");
+function jobsDefiler(d){const c=$("#jobs");if(!c)return;const k=c.querySelector(".job");const pas=k?k.getBoundingClientRect().width+10:200;c.scrollBy({left:d*pas,behavior:"smooth"})}
+function jobsMaj(){const c=$("#jobs");if(!c)return;const w=$("#acc-jobs");const max=c.scrollWidth-c.clientWidth-2;w.querySelector(".jobnav.g").disabled=c.scrollLeft<=2;w.querySelector(".jobnav.d").disabled=c.scrollLeft>=max;const k=c.querySelector(".job");if(k){const pas=k.getBoundingClientRect().width+10;const i=c.scrollLeft>=max?JOBS.length:Math.min(JOBS.length,Math.round(c.scrollLeft/pas)+1);const t=$("#jobcpt");if(t)t.textContent=i+" / "+JOBS.length}}
 function openAcc(id,toggle){const el=$("#acc-"+id);const was=el.classList.contains("open");document.querySelectorAll(".acc").forEach(a=>a.classList.remove("open"));if(!(toggle&&was)){el.classList.add("open");setTimeout(()=>{const sc=$("#s-guide");sc.scrollTo({top:el.getBoundingClientRect().top-sc.getBoundingClientRect().top+sc.scrollTop-12,behavior:"smooth"})},120)}}
 function calc(){const v=+$("#mcIn").value||0;$("#scOut").textContent=Math.floor(v*100*0.97)+" ✦"}
 function norm(s){return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"")}
@@ -842,5 +862,6 @@ setTimeout(()=>$("#splash").classList.add("off"),1500);
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="messagerie.js"></script>
+<script src="grimoire.js"></script>
 </body>
 </html>
