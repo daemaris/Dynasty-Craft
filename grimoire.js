@@ -406,10 +406,16 @@
 
   function planDe(cle) { return donnees.plans.filter(function (p) { return p.cle === cle; })[0] || null; }
 
+  /** Même nom de fichier que le serveur (Terrain.fichier) : « solaris mine » → « solaris-mine ». */
+  function fichierPlan(cle) {
+    var s = String(cle).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    return s || "ville";
+  }
+
   function urlImage(pl) {
     if (!pl || !pl.image_maj) return null;
     var sb = client(), url = null;
-    try { url = sb.storage.from("cartes").getPublicUrl(pl.cle + ".png").data.publicUrl; } catch (e) {}
+    try { url = sb.storage.from("cartes").getPublicUrl(fichierPlan(pl.cle) + ".png").data.publicUrl; } catch (e) {}
     if (!url) return null;
     return url + (url.indexOf("?") < 0 ? "?" : "&") + "v=" + encodeURIComponent(pl.image_maj);
   }
