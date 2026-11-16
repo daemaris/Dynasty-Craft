@@ -9,7 +9,7 @@
 (function () {
   "use strict";
 
-  var donnees = { chapitres: null, quetes: [], etats: {}, villes: null, charge: false, erreur: false };
+  var donnees = { chapitres: null, quetes: [], etats: {}, villes: null, plans: [], charge: false, erreur: false };
   var ouverte = null;            // quête dont le détail est déplié
   var villeChoisie = null;
   var vue = null;                // viewBox de la carte {x, y, w, h}
@@ -45,7 +45,8 @@
       sb.from("quetes_chapitres").select("*").order("ordre"),
       sb.from("quetes").select("*").order("ordre"),
       moi ? sb.from("quetes_etats").select("cle,fini,reclame,fin_le") : Promise.resolve({ data: [] }),
-      sb.from("villes_carte").select("*")
+      sb.from("villes_carte").select("*"),
+      sb.from("villes_plans").select("*")
     ]).then(function (r) {
       if (r[0].error || r[1].error || r[3].error) throw new Error("lecture");
       donnees.chapitres = r[0].data || [];
@@ -53,6 +54,7 @@
       donnees.etats = {};
       (r[2].data || []).forEach(function (e) { donnees.etats[e.cle] = e; });
       donnees.villes = r[3].data || [];
+      donnees.plans = (r[4] && !r[4].error && r[4].data) || [];
       donnees.charge = true;
       donnees.erreur = false;
     }).catch(function () {
@@ -211,6 +213,7 @@
   function afficherCarte() {
     var z = q("#gseg-carte");
     if (!z) return;
+    if (plan.cle && donnees.charge) return afficherPlan();
     if (!donnees.charge) {
       z.innerHTML = donnees.erreur ? carteInfo("🗺️", "La carte ne se charge pas", "Vérifie ta connexion puis reviens sur cet onglet.") : '<div class="empty">Dépliage de la carte…</div>';
       return;
@@ -258,13 +261,18 @@
     var v = vs.filter(function (x) { return x.cle === villeChoisie; })[0];
     if (v) html += ficheVille(v);
 
-    var liste = (donnees.villes || []).slice().sort(function (a, b) { return (b.habitants || 0) - (a.habitants || 0) || String(a.nom).localeCompare(b.nom); });
+    var liste = (donnees.villes || []).slice();
+    donnees.plans.forEach(function (pl) {
+      if (!liste.some(function (v) { return v.cle === pl.cle; })) liste.push({ cle: pl.cle, nom: pl.nom, habitants: 0, planSeul: true });
+    });
+    liste.sort(function (a, b) { return (b.habitants || 0) - (a.habitants || 0) || String(a.nom).localeCompare(b.nom); });
     if (liste.length) {
       html += "<h2>Les villes</h2><div class=\"card\" style=\"padding:4px 14px\">";
       liste.forEach(function (x) {
-        html += '<button class="grligne" onclick="GRIM.ville(\'' + h(x.cle) + '\',true)"><span class="grpin" style="background:' + (x.fermee ? "#8a5a9e" : x.reservee ? "#9c8a6a" : "#7c3aed") + '"></span>' +
+        var aPlan = planDe(x.cle);
+        html += '<button class="grligne" onclick="' + (x.planSeul ? "GRIM.plan(\'" + h(x.cle) + "\')" : "GRIM.ville(\'" + h(x.cle) + "\',true)") + '"><span class="grpin" style="background:' + (x.fermee ? "#8a5a9e" : x.reservee ? "#9c8a6a" : "#7c3aed") + '"></span>' +
           '<span style="flex:1;text-align:left"><b>' + h(x.nom) + '</b><small>' + (x.habitants || 0) + " habitant" + ((x.habitants || 0) > 1 ? "s" : "") +
-          (x.fermee ? " · sur invitation" : "") + (x.reservee ? " · en attente de son chef" : "") + "</small></span><span class=\"chev\">›</span></button>";
+          (x.fermee ? " · sur invitation" : "") + (x.reservee ? " · en attente de son chef" : "") + "</small></span>" + (aPlan ? '<span class="grplanchip">plan</span>' : "") + "<span class=\"chev\">›</span></button>";
       });
       html += "</div>";
     }
@@ -283,7 +291,8 @@
       "<div><span>Fondée</span><b>" + (v.fondee_le ? dateFr(v.fondee_le) : "—") + (v.fondateur_pseudo && v.fondateur_pseudo !== v.chef_pseudo ? "<small>par " + h(v.fondateur_pseudo) + "</small>" : "") + "</b></div>" +
       "<div><span>Centre</span><b>X " + v.x + " · Z " + v.z + "</b></div></div>" +
       '<p class="sub" style="margin:10px 0 0">' + h(etat) + "</p>" +
-      '<button class="btn ghost" style="width:100%;margin-top:10px" onclick="GRIM.copier(' + v.x + "," + v.z + ')">Copier les coordonnées</button></div>';
+      '<div class="grbtns">' + (planDe(v.cle) ? '<button class="btn" onclick="GRIM.plan(\'' + h(v.cle) + '\')">🗺 Ouvrir le plan</button>' : "") +
+      '<button class="btn ghost" onclick="GRIM.copier(' + v.x + "," + v.z + ')">Copier les coordonnées</button></div></div>';
   }
 
   // déplacement à la souris / au doigt et molette
@@ -315,6 +324,286 @@
     if (s) s.setAttribute("viewBox", vue.x + " " + vue.y + " " + vue.w + " " + vue.h);
   }
 
+  // ═══ PLAN D'UNE VILLE ═══════════════════════════════════════════════════
+  var TYPES = {
+    quartier:  { nom: "Quartiers",  ic: "▦", coul: "#c084fc" },
+    propriete: { nom: "Propriétés", ic: "⌂", coul: "#60a5fa" },
+    pnj:       { nom: "PNJ",        ic: "☺", coul: "#7ee0a0" },
+    boutique:  { nom: "Boutiques",  ic: "⛁", coul: "#f0c060" },
+    waystone:  { nom: "Waystones",  ic: "◆", coul: "#67e8f9" }
+  };
+  var CATS = {
+    terrain:     { nom: "Terrain",        coul: "#a3e635" },
+    maison:      { nom: "Maison",         coul: "#60a5fa" },
+    prime:       { nom: "Maison prime",   coul: "#f0c060" },
+    appartement: { nom: "Appartement",    coul: "#f472b6" },
+    atelier:     { nom: "Atelier",        coul: "#fb923c" }
+  };
+  var plan = { cle: null, elements: null, erreur: false, vue: null, fond: null, choisi: null, recherche: "", aVendre: false,
+               filtres: { quartier: true, propriete: true, pnj: true, boutique: true, waystone: true } };
+
+  function planDe(cle) { return donnees.plans.filter(function (p) { return p.cle === cle; })[0] || null; }
+
+  function urlImage(pl) {
+    if (!pl || !pl.image_maj) return null;
+    var sb = client(), url = null;
+    try { url = sb.storage.from("cartes").getPublicUrl(pl.cle + ".png").data.publicUrl; } catch (e) {}
+    if (!url) return null;
+    return url + (url.indexOf("?") < 0 ? "?" : "&") + "v=" + encodeURIComponent(pl.image_maj);
+  }
+
+  function ouvrirPlan(cle) {
+    var pl = planDe(cle);
+    if (!pl) return;
+    plan.cle = cle; plan.elements = null; plan.erreur = false; plan.choisi = null; plan.recherche = "";
+    plan.vue = { x: pl.x0, y: pl.z0, w: pl.largeur, h: pl.hauteur };
+    if (!plan.fond) plan.fond = "jeu";
+    afficherPlan();
+    var sb = client();
+    if (!sb) return;
+    sb.from("carte_elements").select("*").eq("ville", cle).then(function (r) {
+      if (plan.cle !== cle) return;
+      if (r.error) plan.erreur = true; else plan.elements = r.data || [];
+      afficherPlan();
+    });
+    var z = q("#gseg-carte"); if (z) z.scrollIntoView({ block: "start" });
+  }
+
+  function visibles() {
+    var t = plan.recherche.trim().toLowerCase();
+    return (plan.elements || []).filter(function (e) {
+      if (!plan.filtres[e.type]) return false;
+      if (plan.aVendre && e.type === "propriete" && !(e.infos && e.infos.libre && e.categorie !== "atelier")) return false;
+      if (!t) return true;
+      var i = e.infos || {};
+      return [e.nom, i.proprietaire, i.style, i.metier, (CATS[e.categorie] || {}).nom].join(" ").toLowerCase().indexOf(t) >= 0;
+    });
+  }
+
+  function svgPlan(pl) {
+    var v = plan.vue, taille = tailleCarte(pl);
+    var ech = Math.max(v.w / taille.l, v.h / taille.h);   // blocs par pixel d'écran : repères de taille constante
+    var img = plan.fond === "jeu" ? urlImage(pl) : null;
+    var s = '<svg id="grplansvg" viewBox="' + v.x + " " + v.y + " " + v.w + " " + v.h + '" preserveAspectRatio="xMidYMid meet">';
+    var X0 = pl.x0 - pl.largeur, Y0 = pl.z0 - pl.hauteur;
+    if (img) {
+      s += '<rect x="' + X0 + '" y="' + Y0 + '" width="' + pl.largeur * 3 + '" height="' + pl.hauteur * 3 + '" fill="#141019"/>' +
+        '<image href="' + h(img) + '" x="' + pl.img_x0 + '" y="' + pl.img_z0 + '" width="' + pl.img_largeur + '" height="' + pl.img_hauteur + '" style="image-rendering:pixelated" preserveAspectRatio="none"/>';
+    } else {
+      s += '<defs><radialGradient id="grpar2" cx="50%" cy="45%" r="75%"><stop offset="0" stop-color="#efe0bd"/><stop offset=".8" stop-color="#d9c08f"/><stop offset="1" stop-color="#b8975e"/></radialGradient>' +
+        '<pattern id="grgrille" width="16" height="16" patternUnits="userSpaceOnUse" x="0" y="0"><path d="M16 0H0V16" fill="none" stroke="#8a6a3e" stroke-width=".25" opacity=".35"/></pattern></defs>' +
+        '<rect x="' + X0 + '" y="' + Y0 + '" width="' + pl.largeur * 3 + '" height="' + pl.hauteur * 3 + '" fill="url(#grpar2)"/>' +
+        '<rect x="' + X0 + '" y="' + Y0 + '" width="' + pl.largeur * 3 + '" height="' + pl.hauteur * 3 + '" fill="url(#grgrille)"/>';
+    }
+    var els = visibles(), surFond = !!img;
+    // zones : quartiers dessous, propriétés dessus
+    ["quartier", "propriete"].forEach(function (type) {
+      els.forEach(function (e) {
+        if (e.type !== type) return;
+        var choisi = plan.choisi === e.id, i = e.infos || {};
+        var coul = type === "quartier" ? TYPES.quartier.coul : (CATS[e.categorie] || CATS.maison).coul;
+        var libre = type === "propriete" && i.libre && e.categorie !== "atelier";
+        (e.zones || []).forEach(function (r) {
+          s += '<rect class="grzone" data-id="' + h(e.id) + '" x="' + r[0] + '" y="' + r[1] + '" width="' + (r[2] - r[0] + 1) + '" height="' + (r[3] - r[1] + 1) + '"' +
+            ' fill="' + coul + '" fill-opacity="' + (type === "quartier" ? (surFond ? .10 : .14) : choisi ? .65 : libre ? .22 : .42) + '"' +
+            ' stroke="' + (libre ? "#7ee0a0" : coul) + '" stroke-width="' + ech * (choisi ? 3 : type === "quartier" ? 1.4 : 1.6) + '"' +
+            (type === "quartier" ? ' stroke-dasharray="' + ech * 6 + " " + ech * 4 + '"' : libre ? ' stroke-dasharray="' + ech * 3 + " " + ech * 2 + '"' : "") + "/>";
+        });
+      });
+    });
+    // étiquettes des quartiers
+    els.forEach(function (e) {
+      if (e.type !== "quartier") return;
+      var fs = ech * 11;
+      s += '<text x="' + e.x + '" y="' + e.z + '" font-size="' + fs + '" text-anchor="middle" fill="' + (surFond ? "#fff" : "#3b2412") + '" font-family="Cinzel" font-weight="700" paint-order="stroke" stroke="' + (surFond ? "rgba(20,8,36,.85)" : "#efe0bd") + '" stroke-width="' + fs * .25 + '" style="pointer-events:none">' + h(e.nom) + "</text>";
+    });
+    // repères ponctuels
+    els.forEach(function (e) {
+      if (e.type === "quartier" || e.type === "propriete") return;
+      var t = TYPES[e.type], r = ech * (plan.choisi === e.id ? 9 : 7);
+      s += '<g class="grrep" data-id="' + h(e.id) + '">' +
+        '<circle cx="' + (e.x + .5) + '" cy="' + (e.z + .5) + '" r="' + r + '" fill="' + t.coul + '" stroke="#1c0f2e" stroke-width="' + ech * 1.6 + '"/>' +
+        '<text x="' + (e.x + .5) + '" y="' + (e.z + .5 + r * .36) + '" font-size="' + r * 1.05 + '" text-anchor="middle" fill="#1c0f2e" font-weight="700" style="pointer-events:none">' + t.ic + "</text>";
+      if (e.type === "pnj" && v.w < pl.largeur * 0.7) {
+        var fs2 = ech * 9;
+        s += '<text x="' + (e.x + .5) + '" y="' + (e.z + .5 + r + fs2) + '" font-size="' + fs2 + '" text-anchor="middle" fill="#fff" paint-order="stroke" stroke="rgba(20,8,36,.85)" stroke-width="' + fs2 * .3 + '" style="pointer-events:none">' + h(e.nom) + "</text>";
+      }
+      s += "</g>";
+    });
+    return s + "</svg>";
+  }
+
+  function ratio(pl) { return Math.max(0.75, Math.min(1.5, pl.largeur / pl.hauteur)); }
+
+  /** Taille de la carte à l'écran (px), même avant qu'elle soit affichée. */
+  function tailleCarte(pl) {
+    var m = q(".grplanmap");
+    if (m && m.clientWidth) return { l: m.clientWidth, h: m.clientHeight };
+    var z = q("#gseg-carte"), l = Math.max(280, (z && z.clientWidth ? z.clientWidth : 360) - 16);
+    var hh = Math.min(l / ratio(pl), window.innerHeight * 0.64);
+    return { l: l, h: hh };
+  }
+
+  function afficherPlan() {
+    var z = q("#gseg-carte"), pl = planDe(plan.cle);
+    if (!z) return;
+    if (!pl) { plan.cle = null; return afficherCarte(); }
+    var aImage = !!urlImage(pl);
+    var html = '<div class="grplanhead"><button class="icobtn" onclick="GRIM.fermerPlan()" aria-label="Retour">‹</button>' +
+      '<div style="flex:1;min-width:0"><div class="eyebrow">Plan de la ville</div><h3>' + h(pl.nom) + "</h3></div>" +
+      '<div class="grfond"><button class="' + (plan.fond === "jeu" ? "on" : "") + '" onclick="GRIM.fond(\'jeu\')">Vue du jeu</button><button class="' + (plan.fond === "parchemin" ? "on" : "") + '" onclick="GRIM.fond(\'parchemin\')">Parchemin</button></div></div>';
+    // filtres
+    var compte = {};
+    (plan.elements || []).forEach(function (e) { compte[e.type] = (compte[e.type] || 0) + 1; });
+    html += '<div class="grfiltres">';
+    Object.keys(TYPES).forEach(function (k) {
+      var t = TYPES[k];
+      html += '<button class="grfil' + (plan.filtres[k] ? " on" : "") + '" style="--c:' + t.coul + '" onclick="GRIM.filtre(\'' + k + '\')"><span>' + t.ic + "</span>" + t.nom + "<b>" + (compte[k] || 0) + "</b></button>";
+    });
+    html += '<button class="grfil vente' + (plan.aVendre ? " on" : "") + '" style="--c:#7ee0a0" onclick="GRIM.aVendre()"><span>✦</span>À vendre</button></div>';
+    // carte
+    html += '<div class="card grcarte"><div class="grmap grplanmap" style="aspect-ratio:' + ratio(pl).toFixed(3) + '">' +
+      (plan.elements ? svgPlan(pl) : '<div class="empty" style="padding-top:38%">' + (plan.erreur ? "Le plan ne se charge pas." : "Dépliage du plan…") + "</div>") +
+      '<div class="grzoom"><button onclick="GRIM.zoomPlan(0.7)" aria-label="Zoomer">+</button><button onclick="GRIM.zoomPlan(1.43)" aria-label="Dézoomer">−</button><button onclick="GRIM.recentrerPlan()" aria-label="Recentrer">⌖</button></div>' +
+      (plan.fond === "jeu" && !aImage ? '<div class="grnote">Le terrain n\'a pas encore été dessiné : parchemin en attendant.</div>' : "") +
+      "</div>";
+    // légende des propriétés
+    if (plan.filtres.propriete) {
+      html += '<div class="grlegende">';
+      Object.keys(CATS).forEach(function (k) { html += '<span><i style="background:' + CATS[k].coul + '"></i>' + CATS[k].nom + "</span>"; });
+      html += '<span><i class="libre"></i>À vendre</span></div>';
+    }
+    html += "</div>";
+    var e = (plan.elements || []).filter(function (x) { return x.id === plan.choisi; })[0];
+    if (e) html += ficheElement(e);
+    // recherche + liste
+    html += '<div class="grrech"><input id="grrech" type="search" placeholder="Chercher un lieu, un PNJ, un joueur…" value="' + h(plan.recherche) + '" oninput="GRIM.chercher(this.value)"></div>';
+    html += '<div id="grliste">' + listeElements() + "</div>";
+    html += '<p class="proto">NORD EN HAUT · ' + pl.largeur + "×" + pl.hauteur + " BLOCS · DE X " + pl.x0 + " Z " + pl.z0 + "</p>";
+    z.innerHTML = html;
+    brancherPlan();
+  }
+
+  function listeElements() {
+    if (!plan.elements) return "";
+    var els = visibles().filter(function (e) { return e.type !== "quartier" || plan.recherche; });
+    if (!els.length) return '<div class="card" style="padding:14px"><p class="sub" style="margin:0">Rien à afficher avec ces filtres.</p></div>';
+    var ordre = { propriete: 0, pnj: 1, boutique: 2, waystone: 3, quartier: 4 };
+    els.sort(function (a, b) { return ordre[a.type] - ordre[b.type] || String(a.nom).localeCompare(b.nom); });
+    var html = '<div class="card" style="padding:4px 14px">', max = 40;
+    els.slice(0, max).forEach(function (e) {
+      var i = e.infos || {}, t = TYPES[e.type], sous = "";
+      if (e.type === "propriete") sous = (CATS[e.categorie] || {}).nom + " · " + (e.categorie === "atelier" ? (i.metier || "atelier") : i.libre ? "à vendre, " + (i.prix || 0) + " MC" : i.proprietaire);
+      else if (e.type === "boutique") sous = (i.lot || 1) + " pour " + (i.prix || 0) + " MC · " + (i.proprietaire || "");
+      else if (e.type === "pnj") sous = "PNJ";
+      else if (e.type === "waystone") sous = i.genre === "sharestone" ? "Sharestone" : "Waystone";
+      else sous = "Quartier";
+      var coul = e.type === "propriete" ? (CATS[e.categorie] || CATS.maison).coul : t.coul;
+      html += '<button class="grligne" onclick="GRIM.element(\'' + h(e.id) + '\',true)"><span class="grrond" style="background:' + coul + '">' + t.ic + "</span>" +
+        '<span style="flex:1;text-align:left;min-width:0"><b>' + h(e.nom) + "</b><small>" + h(sous) + '</small></span><span class="chev">›</span></button>';
+    });
+    if (els.length > max) html += '<p class="sub" style="font-size:12px;margin:8px 0 10px">… et ' + (els.length - max) + " autres : affine la recherche.</p>";
+    return html + "</div>";
+  }
+
+  function ficheElement(e) {
+    var i = e.infos || {}, t = TYPES[e.type], lignes = [], titre = t.nom.replace(/s$/, "");
+    function bloc(k, v) { lignes.push("<div><span>" + k + "</span><b>" + v + "</b></div>"); }
+    if (e.type === "propriete") {
+      var c = CATS[e.categorie] || { nom: e.categorie };
+      titre = c.nom;
+      if (e.categorie === "atelier") {
+        bloc("Métier", h(i.metier || "—"));
+        bloc("Artisans", (i.artisans && i.artisans.length) ? i.artisans.map(h).join(", ") : "aucun");
+      } else if (i.libre) {
+        bloc("Statut", '<span style="color:var(--live)">À vendre</span>');
+        bloc("Prix", (i.prix || 0) + " MC");
+      } else {
+        bloc("Propriétaire", '<img src="https://mc-heads.net/avatar/' + encodeURIComponent(i.proprietaire || "") + '/32" alt=""> ' + h(i.proprietaire || "?"));
+        bloc("Depuis", i.achete_le ? dateFr(i.achete_le) : "—");
+      }
+      bloc("Surface", (i.surface || 0) + " blocs");
+      if (e.categorie === "appartement" && i.y0 != null) bloc("Hauteur", "Y " + i.y0 + " → " + i.y1);
+      else if (i.style) bloc("Style", h(i.style));
+    } else if (e.type === "boutique") {
+      titre = "Boutique";
+      bloc("Vend", h(e.nom));
+      bloc("Prix", (i.lot || 1) + " pour " + (i.prix || 0) + " MC");
+      bloc("Vendeur", '<img src="https://mc-heads.net/avatar/' + encodeURIComponent(i.proprietaire || "") + '/32" alt=""> ' + h(i.proprietaire || "?"));
+    } else if (e.type === "waystone") {
+      titre = i.genre === "sharestone" ? "Sharestone" : "Waystone";
+      if (i.visibilite) bloc("Accès", i.visibilite === "global" ? "Pour tous" : i.visibilite === "activation" ? "À activer en jeu" : h(i.visibilite));
+    } else if (e.type === "pnj") {
+      titre = "PNJ";
+    }
+    var y = i.y != null ? " · Y " + i.y : "";
+    bloc("Position", "X " + e.x + " · Z " + e.z + y);
+    var sousTitre = e.type === "propriete" && e.categorie !== "atelier" && i.libre ? '<p class="sub" style="margin:10px 0 0">Pour l\'acheter : entre dans la parcelle en jeu et clique sur [Acheter], ou /maison acheter.</p>' : "";
+    return '<div class="card grfiche"><div class="grfh"><div style="flex:1"><div class="eyebrow">' + h(titre) + '</div><h3>' + h(e.nom) + '</h3></div><button class="icobtn" onclick="GRIM.element(null)">✕</button></div>' +
+      '<div class="grfgrid">' + lignes.join("") + "</div>" + sousTitre +
+      '<button class="btn ghost" style="width:100%;margin-top:10px" onclick="GRIM.copier(' + e.x + "," + e.z + ')">Copier les coordonnées</button></div>';
+  }
+
+  // déplacement (un doigt), zoom (deux doigts ou molette), toucher un repère
+  function brancherPlan() {
+    var s = q("#grplansvg");
+    if (!s) return;
+    var points = {}, depart = null, deplace = false, cibleDepart = null;
+    function maj() { s.setAttribute("viewBox", plan.vue.x + " " + plan.vue.y + " " + plan.vue.w + " " + plan.vue.h); }
+    function etat() {
+      var ids = Object.keys(points), r = s.getBoundingClientRect();
+      if (ids.length === 1) { var p = points[ids[0]]; return { x: p.x, y: p.y, d: 0, r: r }; }
+      var a = points[ids[0]], b = points[ids[1]];
+      return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, d: Math.hypot(a.x - b.x, a.y - b.y), r: r };
+    }
+    s.addEventListener("pointerdown", function (e) {
+      if (!Object.keys(points).length) { var c0 = e.target.closest ? e.target.closest("[data-id]") : null; cibleDepart = c0 ? c0.getAttribute("data-id") : null; }
+      points[e.pointerId] = { x: e.clientX, y: e.clientY };
+      try { s.setPointerCapture(e.pointerId); } catch (x) {}
+      depart = { e: etat(), v: { x: plan.vue.x, y: plan.vue.y, w: plan.vue.w, h: plan.vue.h } };
+      if (Object.keys(points).length === 1) deplace = false;
+    });
+    s.addEventListener("pointermove", function (e) {
+      if (!points[e.pointerId] || !depart) return;
+      points[e.pointerId] = { x: e.clientX, y: e.clientY };
+      var n = etat(), d0 = depart.e, v0 = depart.v;
+      var k = v0.w / n.r.width;
+      var f = d0.d > 0 && n.d > 0 ? d0.d / n.d : 1;
+      var w = Math.max(32, Math.min(v0.w * f, 4096)), hh = v0.h * (w / v0.w);
+      // le point sous les doigts reste sous les doigts
+      var px = v0.x + (d0.x - n.r.left) * k, py = v0.y + (d0.y - n.r.top) * (v0.h / n.r.height);
+      var k2 = w / n.r.width;
+      plan.vue = { x: px - (n.x - n.r.left) * k2, y: py - (n.y - n.r.top) * (hh / n.r.height), w: w, h: hh };
+      if (Math.abs(n.x - d0.x) + Math.abs(n.y - d0.y) > 6 || f !== 1) deplace = true;
+      maj();
+    });
+    function fin(e) {
+      var zoome = Object.keys(points).length > 1;
+      delete points[e.pointerId];
+      if (Object.keys(points).length) { depart = { e: etat(), v: { x: plan.vue.x, y: plan.vue.y, w: plan.vue.w, h: plan.vue.h } }; return; }
+      depart = null;
+      if (zoome || (deplace && Math.abs(plan.vue.w - (plan._wDessin || 0)) > 1)) afficherPlanSvg();
+    }
+    ["pointerup", "pointercancel"].forEach(function (n) { s.addEventListener(n, fin); });
+    s.addEventListener("click", function (e) {
+      if (deplace) { e.preventDefault(); return; }
+      GRIM.element(cibleDepart);
+    });
+    s.addEventListener("wheel", function (e) { e.preventDefault(); GRIM.zoomPlan(e.deltaY > 0 ? 1.15 : 0.87); }, { passive: false });
+    plan._wDessin = plan.vue.w;
+  }
+
+  /** Redessine seulement la carte (tailles des repères adaptées au zoom). */
+  function afficherPlanSvg() {
+    var m = q(".grplanmap"), pl = planDe(plan.cle);
+    if (!m || !pl || !plan.elements) return;
+    var ancien = q("#grplansvg");
+    var tmp = document.createElement("div");
+    tmp.innerHTML = svgPlan(pl);
+    if (ancien) ancien.replaceWith(tmp.firstChild); else m.insertBefore(tmp.firstChild, m.firstChild);
+    brancherPlan();
+  }
+
   // ─── API pour les boutons ────────────────────────────────────────────────
   window.GRIM = {
     ouvrir: function (cle) { ouverte = ouverte === cle ? null : cle; afficherQuetes(); },
@@ -331,6 +620,30 @@
     },
     zoom: zoom,
     recentrer: function () { vue = null; afficherCarte(); },
+    plan: function (cle) { ouvrirPlan(cle); },
+    fermerPlan: function () { plan.cle = null; plan.elements = null; afficherCarte(); },
+    fond: function (f) { plan.fond = f; afficherPlan(); },
+    filtre: function (k) { plan.filtres[k] = !plan.filtres[k]; afficherPlan(); },
+    aVendre: function () { plan.aVendre = !plan.aVendre; if (plan.aVendre) plan.filtres.propriete = true; afficherPlan(); },
+    chercher: function (t) { plan.recherche = t; var l = q("#grliste"); if (l) l.innerHTML = listeElements(); afficherPlanSvg(); },
+    element: function (id, centrer) {
+      plan.choisi = id;
+      var e = (plan.elements || []).filter(function (x) { return x.id === id; })[0];
+      if (e && centrer) {
+        var w = Math.min(plan.vue.w, 160), hh = plan.vue.h * (w / plan.vue.w);
+        plan.vue = { x: e.x - w / 2, y: e.z - hh / 2, w: w, h: hh };
+      }
+      var y = window.scrollY;
+      afficherPlan();
+      if (e) setTimeout(function () { var f = q(centrer ? ".grplanmap" : ".grfiche"); if (f) f.scrollIntoView({ behavior: "smooth", block: centrer ? "start" : "nearest" }); }, 60);
+    },
+    zoomPlan: function (f) {
+      var v = plan.vue; if (!v) return;
+      var cx = v.x + v.w / 2, cy = v.y + v.h / 2, w = Math.max(32, Math.min(v.w * f, 4096)), hh = v.h * (w / v.w);
+      plan.vue = { x: cx - w / 2, y: cy - hh / 2, w: w, h: hh };
+      afficherPlanSvg();
+    },
+    recentrerPlan: function () { var pl = planDe(plan.cle); if (pl) { plan.vue = { x: pl.x0, y: pl.z0, w: pl.largeur, h: pl.hauteur }; afficherPlanSvg(); } },
     copier: function (x, z) {
       var t = x + " ~ " + z;
       (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { notif("✓ Coordonnées copiées : " + t); }, function () { notif("X " + x + " · Z " + z); });
@@ -390,6 +703,32 @@
     ".grligne{display:flex;align-items:center;gap:12px;width:100%;padding:11px 0;border-bottom:1px solid var(--line)}",
     ".grligne:last-child{border-bottom:0}",
     ".grligne small{display:block;color:var(--dim);font-size:12px}",
+    ".grplanchip{font-family:'Pixelify Sans';font-size:11px;color:var(--ice);padding:3px 8px;border-radius:8px;background:rgba(192,132,252,.15);margin-right:6px}",
+    ".grbtns{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px}",
+    ".grbtns .btn{width:100%}",
+    ".grplanhead{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}",
+    ".grplanhead h3{font-size:19px;margin:2px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}",
+    ".grfond{display:flex;padding:3px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--line)}",
+    ".grfond button{padding:7px 10px;border-radius:9px;font-size:12.5px;color:var(--mute)}",
+    ".grfond button.on{background:rgba(192,132,252,.22);color:var(--ink)}",
+    ".grfiltres{display:flex;gap:6px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}",
+    ".grfiltres::-webkit-scrollbar{display:none}",
+    ".grfil{flex:none;display:flex;align-items:center;gap:6px;padding:7px 11px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--dim);font-size:13px}",
+    ".grfil span{color:var(--c);font-size:12px}",
+    ".grfil b{font-family:'Pixelify Sans';font-weight:400;font-size:11.5px;opacity:.75}",
+    ".grfil.on{color:var(--ink);border-color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent)}",
+    ".grplanmap{background:#141019;max-height:64vh;margin:0 auto}",
+    ".grplanmap .grzone,.grplanmap .grrep{cursor:pointer}",
+    ".grnote{position:absolute;left:8px;top:8px;right:54px;padding:6px 9px;border-radius:9px;background:rgba(28,15,46,.85);font-size:11.5px;color:var(--mute)}",
+    ".grlegende{display:flex;flex-wrap:wrap;gap:6px 12px;padding:10px 4px 2px;font-size:11.5px;color:var(--mute)}",
+    ".grlegende span{display:flex;align-items:center;gap:5px}",
+    ".grlegende i{width:11px;height:11px;border-radius:3px;display:inline-block}",
+    ".grlegende i.libre{border:1.5px dashed var(--live)}",
+    ".grrech{margin:14px 0 10px}",
+    ".grrech input{width:100%;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--ink);font:inherit;font-size:14px}",
+    ".grrond{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#1c0f2e;font-size:13px;font-weight:700;flex:none}",
+    "@media(min-width:560px){.grbtns{grid-template-columns:1fr 1fr}}",
+    "@media(max-width:559px){.grfond{width:100%}.grfond button{flex:1}}",
     ".grpin{width:12px;height:12px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);flex:none}"
   ].join("\n");
   var st = document.createElement("style");
