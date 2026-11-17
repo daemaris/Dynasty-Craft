@@ -1,5 +1,15 @@
 [
   {
+    "id": "mise-a-jour-17-11-2026",
+    "cat": "Mise à jour",
+    "date": "2026-11-17",
+    "ic": "🌙",
+    "g": "linear-gradient(135deg,#3b1d6e,#140a24)",
+    "t": "Mise à jour 17/11/2026",
+    "s": "Le Coven a bien travaillé ces derniers jours ! Voici les nouveautés.",
+    "b": "Mes quêtes\n\nUn onglet Quêtes dans le Guide, qui se coche tout seul quand vous terminez une quête en jeu\nLe récit, les objectifs et les récompenses de chaque quête\nLe rappel « à réclamer dans le grimoire » pour les récompenses oubliées\n\nCarte des villes\n\nUne carte en parchemin avec toutes les villes du serveur\nLe plan de chaque ville : quartiers, maisons et propriétaires, boutiques, PNJ et waystones\n\nMessagerie\n\nDiscutez entre le jeu et l’app : connectez-vous avec Discord, puis tapez /message lier en jeu\nUn canal par ville pour s’organiser entre habitants\n\nUn serveur plus stable\n\nLes sacs à dos posés sur un entonnoir ne font plus laguer le serveur\nUn nouveau gardien, le Gendarme, surveille ce qui fait ramer le serveur et prévient le staff\n\nMerci pour votre patience et vos retours pendant la bêta 💜"
+  },
+  {
     "id": "maj-2026-11-14",
     "cat": "Mise à jour",
     "date": "2026-11-14",
